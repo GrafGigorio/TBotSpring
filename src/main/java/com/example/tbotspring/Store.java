@@ -1,40 +1,63 @@
 package com.example.tbotspring;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 @Entity
 @Table(name = "shop")
-public class Shop {
+public class Store {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
-    private Long mastertgid;
+    private Long userid;
     private String title;
 
-    public Shop() {
+    public Store(Long userid, String title) {
+        this.userid = userid;
+        this.title = title;
     }
 
-    public Shop(Long mastertgid, String title) {
-        this.mastertgid = mastertgid;
-        this.title = title;
+    public Store() {
+
     }
 
     @Override
     public String toString() {
-        return "Shop{" +
+        return "Store{" +
                 "id=" + id +
-                ", mastertgid=" + mastertgid +
+                ", userid=" + userid +
                 ", title='" + title + '\'' +
                 '}';
     }
-
-    public Long getMastertgid() {
-        return mastertgid;
+    public static Store getStore(Long id)
+    {
+        return dataBase.getStore(id);
+    }
+    public static Store updateStore(Store store)
+    {
+        return dataBase.updateStore(store);
+    }
+    public Store deleteThisStore()
+    {
+        dataBase.deleteStore(this);
+        return this;
     }
 
-    public void setMastertgid(Long mastertgid) {
-        this.mastertgid = mastertgid;
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Long getUserid() {
+        return userid;
+    }
+
+    public void setUserid(Long userid) {
+        this.userid = userid;
     }
 
     public String getTitle() {
@@ -43,5 +66,18 @@ public class Shop {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Store store = (Store) o;
+        return id.equals(store.id) && userid.equals(store.userid) && Objects.equals(title, store.title);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, userid, title);
     }
 }
