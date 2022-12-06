@@ -1,4 +1,4 @@
-package com.example.tbotspring;
+package com.example.tbotspring.bot.entity;
 
 import javax.persistence.*;
 

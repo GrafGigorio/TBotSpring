@@ -1,4 +1,6 @@
-package com.example.tbotspring;
+package com.example.tbotspring.bot.entity;
+
+
 
 import javax.persistence.*;
 import java.util.Objects;
@@ -17,6 +19,9 @@ public class Store {
         this.userid = userid;
         this.title = title;
     }
+    public Store(String title) {
+        this.title = title;
+    }
 
     public Store() {
 
@@ -29,19 +34,6 @@ public class Store {
                 ", userid=" + userid +
                 ", title='" + title + '\'' +
                 '}';
-    }
-    public static Store getStore(Long id)
-    {
-        return dataBase.getStore(id);
-    }
-    public static Store updateStore(Store store)
-    {
-        return dataBase.updateStore(store);
-    }
-    public Store deleteThisStore()
-    {
-        dataBase.deleteStore(this);
-        return this;
     }
 
     public Long getId() {
