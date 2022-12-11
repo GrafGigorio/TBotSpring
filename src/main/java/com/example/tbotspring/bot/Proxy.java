@@ -2,21 +2,23 @@ package com.example.tbotspring.bot;
 
 import com.example.tbotspring.StartBot;
 import com.example.tbotspring.bot.DAO.*;
+import com.example.tbotspring.bot.action.Button;
+import com.example.tbotspring.bot.action.MessageBot;
 import com.example.tbotspring.bot.entity.Await;
 import com.example.tbotspring.bot.entity.LastMessage;
 import com.example.tbotspring.bot.entity.Store;
 import com.example.tbotspring.bot.entity.UserBot;
 import com.example.tbotspring.bot.menu.Menu;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.stereotype.Component;
+import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageReplyMarkup;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
+import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
-import javax.persistence.Transient;
 import java.util.List;
 
 public class Proxy {
@@ -40,71 +42,82 @@ public class Proxy {
 
         //Проверряем наличие отложенных заданий(В случаях где от пользователя ожидается получение названия какого либо обьекта)
         List<Await> awaits = awaitDao.getAll(userBot.getId());
+        MessageBot messageBot = new MessageBot(startBot,update,userBot);
+        Button button = new Button(startBot,update);
+
+
 
         if(awaits.size() > 0)
         {
             Await await = awaits.get(0);
-            String command = await.getCommand();
+            if(update.getMessage() == null)
+            {
+                messageBot.sendMessage("Отложенная команда: " + await.getCommand() + " не распознанна!");
+                Message message = messageBot.sendMenu(Menu.getStartMenu(userBot));
+                LastMessage lastMessage = lastMessageDAO.getLastMessage(userBot.getId());
+                lastMessage.setLastMessageId(message.getMessageId());
+                lastMessageDAO.updateLastMessage(lastMessage);
+                awaitDao.delete(await);
+                return;
+            }
+
+            Long objId = -1L;
+            String mes = "";
+            String[] comandSeq = await.getCommand().split(":");
+            if(comandSeq.length > 2)
+            {
+                objId = Long.valueOf(comandSeq[2]);
+                mes = comandSeq[0]+":"+comandSeq[1]+":";
+            }
+            else
+            {
+                mes = update.getMessage().getText();
+            }
+
             //Перечисление отложенных комманд
-            switch (command)
+            switch (mes)
             {
                 //Создание магазина
                 case Var.createStore -> {
-                    userBot.setStore(new Store(update.getMessage().getText()));
-                    userBotDAO.update(userBot);
+                    Store store = new Store(userBot.getId(),update.getMessage().getText());
+                    storeDao.saveOrUpdateStore(store);
+                    awaitDao.delete(await);
+                    messageBot.sendMessage("Магазин " + update.getMessage().getText() + " успешно созданн!");
+                    messageBot.sendMenu(Menu.getStartMenu(userBot));
+                }
+                //Переименовывание магазина
+                case Var.storeEdit -> {
+                    awaitDao.delete(await);
+                    Store store = storeDao.getStore(objId);
+                    store.setTitle(update.getMessage().getText());
+                    storeDao.saveOrUpdateStore(store);
+                    messageBot.sendMessage("Магазин #"+ store.getId() + "  переименован на "+store.getTitle());
+                    Message message = sendMenu(userBot.getTgId(),Var.getStoresTitle,Menu.getStoresList(userBot));
+                    LastMessage lastMessage = lastMessageDAO.getLastMessage(userBot.getId());
+                    lastMessage.setLastMessageId(message.getMessageId().longValue());
+                    lastMessageDAO.updateLastMessage(lastMessage);
                 }
                 //Если не найденна команда
                 default -> {
-                    this.sendMessage("Отложенная команда: " + command + " не распознанна!");
-                    this.sendMenu(Menu.getStartMenu(userBot));
+                    messageBot.sendMessage("Отложенная команда: " + mes + " не распознанна!");
+                    messageBot.sendMenu(Menu.getStartMenu(userBot));
+                    awaitDao.delete(await);
                 }
             }
-            awaitDao.delete(await);
             return;
         }
         //Обработка сообщений
         if(update.getMessage() != null)
         {
-            LastMessage lastMessage = new LastMessage(userBot,2132L);
-
-            lastMessageDAO.setLastMessage(lastMessage);
-
-
-            this.sendMessage("Команда: " + update.getMessage().getText() + " не распознанна!");
-            this.sendMenu(Menu.getStartMenu(userBot));
+            messageBot.execute(update);
         }
         //Обработка кнопок меню
         if(update.getCallbackQuery() != null)
         {
-            String mes = update.getCallbackQuery().getMessage().getText();
-            switch (mes)
-            {
-                case Var.createStore -> {
-                    Await await = new Await(Var.createStore);
-                    this.sendMessage("Введите название нового магазина!");
-                }
-            }
+            button.execute(update);
         }
     }
-    private void sendMessage(String mes)
-    {
-        SendMessage smd = SendMessage.builder().chatId(update.getMessage().getFrom().getId())
-                .text(mes).build();
-        try {
-            startBot.execute(smd);
-        } catch (TelegramApiException e) {
-            throw new RuntimeException(e);
-        }
-    }
-    private SendMessage sendMenu(SendMessage menu)
-    {
-        try {
-            startBot.execute(menu);
-            return menu;
-        } catch (TelegramApiException e) {
-            throw new RuntimeException(e);
-        }
-    }
+
     private void getFrom(Update update)
     {
         UserBot userBotTh = null;
@@ -131,6 +144,17 @@ public class Proxy {
             userBotDAO.update(userBot2);
         }
         userBot = userBotTh;
+    }
+
+    public Message sendMenu(Long who, String txt, InlineKeyboardMarkup kb) {
+        SendMessage sm = SendMessage.builder().chatId(who.toString())
+                .parseMode("HTML").text(txt)
+                .replyMarkup(kb).build();
+        try {
+            return startBot.execute(sm);
+        } catch (TelegramApiException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 }

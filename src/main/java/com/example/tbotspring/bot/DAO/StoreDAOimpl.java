@@ -47,7 +47,7 @@ public class StoreDAOimpl implements StoreDao{
             session.beginTransaction();
             session.saveOrUpdate(store);
             session.getTransaction().commit();
-            return session.get(Store.class,store.getId());
+            return store;
         }
     }
 

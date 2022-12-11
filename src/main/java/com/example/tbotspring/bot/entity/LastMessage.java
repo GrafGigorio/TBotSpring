@@ -9,7 +9,7 @@ public class LastMessage {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
     @OneToOne
-    @JoinColumn(name = "userid")
+    @JoinColumn(name = "userId")
     private UserBot userBot;
     private Long lastMessageId;
 
@@ -19,6 +19,11 @@ public class LastMessage {
     public LastMessage(UserBot userBot, Long lastMessageId) {
         this.userBot = userBot;
         this.lastMessageId = lastMessageId;
+    }
+
+    public LastMessage(UserBot userBot, Integer lastMessageId) {
+        this.userBot = userBot;
+        this.lastMessageId = Long.valueOf(lastMessageId);
     }
 
     public long getId() {
@@ -43,6 +48,9 @@ public class LastMessage {
 
     public void setLastMessageId(Long lastMessageId) {
         this.lastMessageId = lastMessageId;
+    }
+    public void setLastMessageId(Integer lastMessageId) {
+        this.lastMessageId = Long.valueOf(lastMessageId);
     }
 
     @Override

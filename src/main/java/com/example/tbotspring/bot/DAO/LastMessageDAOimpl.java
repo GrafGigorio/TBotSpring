@@ -8,6 +8,10 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 
+import javax.persistence.NoResultException;
+import javax.persistence.NonUniqueResultException;
+import java.util.List;
+
 public class LastMessageDAOimpl implements LastMessageDAO {
     SessionFactory sessionFactory = new Configuration()
             .configure()
@@ -18,10 +22,35 @@ public class LastMessageDAOimpl implements LastMessageDAO {
             .buildSessionFactory();
 
     @Override
+    public LastMessage getLastMessage(Integer userId) {
+        return this.getLastMessage(userId.longValue());
+    }
+
+    @Override
     public LastMessage getLastMessage(Long userId) {
         try(Session session = sessionFactory.getCurrentSession()) {
             session.beginTransaction();
-            return session.createQuery("from LastMessage where userBot.tgId="+userId, LastMessage.class).getSingleResult();
+            return session.createQuery("from LastMessage where userBot="+userId, LastMessage.class).getSingleResult();
+        }
+        catch (NoResultException d)
+        {
+            System.out.println("Last message not find >>>> "+d.getMessage());
+            return null;
+        }
+        catch (NonUniqueResultException a)
+        {
+            //если найденно несколько последных сообщений удаляем все и создаем новое
+            try(Session session = sessionFactory.getCurrentSession()) {
+                session.beginTransaction();
+                List<LastMessage> lastMessages = session.createQuery("from LastMessage where userBot="+userId, LastMessage.class).getResultList();
+
+                for ( LastMessage lastMessage : lastMessages)
+                {
+                    session.delete(lastMessage);
+                }
+                session.getTransaction().commit();
+                return this.getLastMessage(userId);
+            }
         }
     }
 

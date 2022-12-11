@@ -20,8 +20,8 @@ public class Await {
         this.command = command;
     }
 
-    public Await(Long tgUserId, String command) {
-        this.userid = tgUserId;
+    public Await(Long userBotId, String command) {
+        this.userid = userBotId;
         this.command = command;
     }
 

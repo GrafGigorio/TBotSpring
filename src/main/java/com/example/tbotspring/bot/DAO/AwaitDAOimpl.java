@@ -27,6 +27,15 @@ public class AwaitDAOimpl implements AwaitDao {
             return session.get(Await.class,await.getId());
         }
     }
+    @Override
+    public Await set(Await await) {
+        try(Session session = sessionFactory.getCurrentSession()) {
+            session.beginTransaction();
+            session.save(await);
+            session.getTransaction().commit();
+            return await;
+        }
+    }
 
     @Override
     public Await get(Long userid) {
