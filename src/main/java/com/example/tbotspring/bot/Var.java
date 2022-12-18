@@ -1,6 +1,9 @@
 package com.example.tbotspring.bot;
 
 
+import com.example.tbotspring.bot.entity.*;
+import org.hibernate.SessionFactory;
+import org.hibernate.cfg.Configuration;
 
 public class Var {
     public static final String createStore = "/create_store";
@@ -11,4 +14,18 @@ public class Var {
     public static final String storeGet = "store:get:";
     public static final String storeEdit = "store:edit:";
     public static final String storeDelete = "store:delete:";
+    public static final String catalogCreate = "catalog:create:";
+    public static final String catalogGet = "catalog:get:";
+    public static final String catalogGetMasterTitle = "Список каталогов";
+    public static final String catalogGetChildTitle = "Список дочерних каталогов";
+    public static final String catalogEdit = "catalog:edit:";
+    public static final String catalogDelete = "catalog:delete:";
+    public static final SessionFactory sessionFactory = new Configuration()
+                .configure()
+                .addAnnotatedClass(LastMessage .class)
+                .addAnnotatedClass(UserBot .class)
+                .addAnnotatedClass(Store .class)
+                .addAnnotatedClass(Await .class)
+                .addAnnotatedClass(Catalog .class)
+                .buildSessionFactory();
 }

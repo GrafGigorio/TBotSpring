@@ -117,11 +117,6 @@ public class UserBot {
         this.id = id;
     }
 
-    public List<Store> getStores() {
-        StoreDao storeDao = new StoreDAOimpl();
-        return storeDao.getAllUserStores(this.id);
-    }
-
     public void setStores(List<Store> stores) {
         this.stores = stores;
     }

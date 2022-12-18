@@ -1,56 +1,27 @@
 package com.example.tbotspring.bot.DAO;
 
 import com.example.tbotspring.bot.Var;
-import com.example.tbotspring.bot.entity.Await;
-import com.example.tbotspring.bot.entity.Store;
-import com.example.tbotspring.bot.entity.UserBot;
+import com.example.tbotspring.bot.entity.*;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 
 import java.util.List;
 
-public class StoreDAOimpl implements StoreDao{
+public class CatalogDAOimpl implements CatalogDAO {
     SessionFactory sessionFactory;
     Session session;
-
-    public StoreDAOimpl() {
+    public CatalogDAOimpl() {
         this.sessionFactory = Var.sessionFactory;
         this.session = sessionFactory.getCurrentSession();
     }
 
     @Override
-    public List<Store> getAllStore() {
-        //Session session = sessionFactory.getCurrentSession();
-        try {
-            session.beginTransaction();
-            return session.createQuery("from Store", Store.class).getResultList();
-        }
-        finally {
-            session.close();
-        }
-    }
-
-    @Override
-    public List<Store> getAllUserStores(Long userId) {
-        //Session session = sessionFactory.getCurrentSession();
-        try{
-            session = sessionFactory.openSession();
-            session.beginTransaction();
-            return session.createQuery("from Store where userid="+userId, Store.class).getResultList();
-        }
-        finally {
-            session.close();
-        }
-    }
-
-    @Override
-    public Store getStore(Long storeId) {
-        //Session session = sessionFactory.getCurrentSession();
+    public List<Catalog> getCatalogAllStore(Long shopid) {
         try {
             session = sessionFactory.openSession();
             session.beginTransaction();
-            return session.get(Store.class,storeId);
+            return session.createQuery("from Catalog where shopId="+shopid, Catalog.class).getResultList();
         }
         finally {
             session.close();
@@ -58,13 +29,11 @@ public class StoreDAOimpl implements StoreDao{
     }
 
     @Override
-    public Store saveOrUpdateStore(Store store) {
-        //Session session = sessionFactory.getCurrentSession();
+    public List<Catalog> getChildren(Long section) {
         try {
+            session = sessionFactory.openSession();
             session.beginTransaction();
-            session.saveOrUpdate(store);
-            session.getTransaction().commit();
-            return store;
+            return session.createQuery("from Catalog where fatherId="+section, Catalog.class).getResultList();
         }
         finally {
             session.close();
@@ -72,13 +41,35 @@ public class StoreDAOimpl implements StoreDao{
     }
 
     @Override
-    public Store deleteStore(Store store) {
-        //Session session = sessionFactory.getCurrentSession();
+    public void set(Catalog section) {
         try {
             session.beginTransaction();
-            session.delete(store);
+            session.save(section);
             session.getTransaction().commit();
-            return store;
+        }
+        finally {
+            session.close();
+        }
+    }
+
+    @Override
+    public void delete(Catalog section) {
+        try {
+            session.beginTransaction();
+            session.delete(section);
+            session.getTransaction().commit();
+        }
+        finally {
+            session.close();
+        }
+    }
+
+    @Override
+    public void update(Catalog section) {
+        try {
+            session.beginTransaction();
+            session.update(section);
+            session.getTransaction().commit();
         }
         finally {
             session.close();

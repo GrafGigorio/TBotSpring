@@ -4,11 +4,10 @@ import com.example.tbotspring.StartBot;
 import com.example.tbotspring.bot.DAO.*;
 import com.example.tbotspring.bot.action.Button;
 import com.example.tbotspring.bot.action.MessageBot;
-import com.example.tbotspring.bot.entity.Await;
-import com.example.tbotspring.bot.entity.LastMessage;
-import com.example.tbotspring.bot.entity.Store;
-import com.example.tbotspring.bot.entity.UserBot;
+import com.example.tbotspring.bot.entity.*;
 import com.example.tbotspring.bot.menu.Menu;
+import org.hibernate.SessionFactory;
+import org.hibernate.cfg.Configuration;
 import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageReplyMarkup;
@@ -27,12 +26,14 @@ public class Proxy {
     private AwaitDao awaitDao = new AwaitDAOimpl();
     private UserBotDAO userBotDAO = new UserBotDAOImpl();
     private LastMessageDAO lastMessageDAO = new LastMessageDAOimpl();
+    private CatalogDAO catalogDAO = new CatalogDAOimpl();
     private StartBot startBot;
     private Update update;
     private UserBot userBot;
 
     public Proxy(StartBot startBot) {
         this.startBot = startBot;
+
     }
 
     public void proxy(Update update)
@@ -62,10 +63,16 @@ public class Proxy {
             }
 
             Long objId = -1L;
+            Long objId2 = -1L;
+            Long objId3 = -1L;
             String mes = "";
             String[] comandSeq = await.getCommand().split(":");
             if(comandSeq.length > 2)
             {
+                if(comandSeq.length > 3)
+                    objId2 = Long.valueOf(comandSeq[3]);
+                if(comandSeq.length > 4)
+                    objId3 = Long.valueOf(comandSeq[3]);
                 objId = Long.valueOf(comandSeq[2]);
                 mes = comandSeq[0]+":"+comandSeq[1]+":";
             }
@@ -93,10 +100,27 @@ public class Proxy {
                     storeDao.saveOrUpdateStore(store);
                     messageBot.sendMessage("Магазин #"+ store.getId() + "  переименован на "+store.getTitle());
                     Message message = sendMenu(userBot.getTgId(),Var.getStoresTitle,Menu.getStoresList(userBot));
+
                     LastMessage lastMessage = lastMessageDAO.getLastMessage(userBot.getId());
                     lastMessage.setLastMessageId(message.getMessageId().longValue());
                     lastMessageDAO.updateLastMessage(lastMessage);
                 }
+                case Var.catalogCreate -> {
+                    Catalog catalog = new Catalog(objId2,update.getMessage().getText(),objId,-1L);
+                    catalogDAO.set(catalog);
+                    awaitDao.delete(await);
+                    messageBot.sendMessage("Каталог " + update.getMessage().getText() + " успешно созданн!");
+                    Message message = null;
+                    if(objId2 == -1L)
+                        message = sendMenu(userBot.getTgId(),Var.catalogGetMasterTitle,Menu.getCatalogMenu(objId,objId2,objId3));
+                    else
+                        message = sendMenu(userBot.getTgId(),Var.catalogGetChildTitle,Menu.getCatalogMenu(objId,objId2,objId3));
+
+                    LastMessage lastMessage = lastMessageDAO.getLastMessage(userBot.getId());
+                    lastMessage.setLastMessageId(message.getMessageId().longValue());
+                    lastMessageDAO.updateLastMessage(lastMessage);
+                }
+
                 //Если не найденна команда
                 default -> {
                     messageBot.sendMessage("Отложенная команда: " + mes + " не распознанна!");

@@ -1,5 +1,6 @@
 package com.example.tbotspring.bot.DAO;
 
+import com.example.tbotspring.bot.Var;
 import com.example.tbotspring.bot.entity.Await;
 import com.example.tbotspring.bot.entity.LastMessage;
 import com.example.tbotspring.bot.entity.Store;
@@ -15,63 +16,82 @@ import java.util.List;
 public class UserBotDAOImpl implements UserBotDAO{
 //    @Autowired
 //    SessionFactory sessionFactory;
-    SessionFactory sessionFactory = new Configuration()
-            .configure()
-            .addAnnotatedClass(UserBot.class)
-            .addAnnotatedClass(Store.class)
-            .addAnnotatedClass(Await.class)
-            .addAnnotatedClass(LastMessage.class)
-            .buildSessionFactory();
+    SessionFactory sessionFactory;
+    Session session;
+
+    public UserBotDAOImpl() {
+        this.sessionFactory = Var.sessionFactory;
+        this.session = sessionFactory.openSession();
+    }
+
     @Override
     public List<UserBot> getAllUserBot() {
-        try(Session session = sessionFactory.getCurrentSession()) {
+        try {
             session.beginTransaction();
             return session.createQuery("from UserBot", UserBot.class).getResultList();
+        }
+        finally {
+            session.close();
         }
     }
 
     @Override
     public UserBot getUserBot(Long id) {
-        try(Session session = sessionFactory.getCurrentSession()) {
+        try {
             session.beginTransaction();
             return session.get(UserBot.class,id);
+        }
+        finally {
+            session.close();
         }
     }
 
     @Override
     public UserBot getUserBot(User user) {
-        try(Session session = sessionFactory.getCurrentSession()) {
+        try {
             session.beginTransaction();
             return session.byNaturalId(UserBot.class).using("tgId",user.getId()).load();
             //return session.createQuery("from UserBot where tgId="+ user.getId(), UserBot.class).getSingleResult();
+        }
+        finally {
+            session.close();
         }
     }
 
     @Override
     public UserBot update(UserBot userBot) {
-        try(Session session = sessionFactory.getCurrentSession()) {
+        try {
             session.beginTransaction();
             session.update(userBot);
             session.getTransaction().commit();
             return userBot;
         }
+        finally {
+            session.close();
+        }
     }
     @Override
     public UserBot save(UserBot userBot) {
-        try(Session session = sessionFactory.getCurrentSession()) {
+        try {
             session.beginTransaction();
             session.save(userBot);
             session.getTransaction().commit();
             return userBot;
         }
+        finally {
+            session.close();
+        }
     }
 
     @Override
     public UserBot deleteUserBot(UserBot userBot) {
-        try(Session session = sessionFactory.getCurrentSession()) {
+        try {
             session.beginTransaction();
             session.delete(userBot);
             session.getTransaction().commit();
+        }
+        finally {
+            session.close();
         }
         return userBot;
     }

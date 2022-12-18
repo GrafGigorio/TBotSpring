@@ -1,5 +1,6 @@
 package com.example.tbotspring.bot.DAO;
 
+import com.example.tbotspring.bot.Var;
 import com.example.tbotspring.bot.entity.Await;
 import com.example.tbotspring.bot.entity.LastMessage;
 import com.example.tbotspring.bot.entity.Store;
@@ -13,13 +14,13 @@ import javax.persistence.NonUniqueResultException;
 import java.util.List;
 
 public class LastMessageDAOimpl implements LastMessageDAO {
-    SessionFactory sessionFactory = new Configuration()
-            .configure()
-            .addAnnotatedClass(LastMessage.class)
-            .addAnnotatedClass(UserBot.class)
-            .addAnnotatedClass(Store.class)
-            .addAnnotatedClass(Await.class)
-            .buildSessionFactory();
+    SessionFactory sessionFactory;
+    Session session;
+
+    public LastMessageDAOimpl() {
+        this.sessionFactory = Var.sessionFactory;
+        session = sessionFactory.getCurrentSession();
+    }
 
     @Override
     public LastMessage getLastMessage(Integer userId) {
@@ -28,7 +29,9 @@ public class LastMessageDAOimpl implements LastMessageDAO {
 
     @Override
     public LastMessage getLastMessage(Long userId) {
-        try(Session session = sessionFactory.getCurrentSession()) {
+
+        try {
+            session = session.isOpen() ? session : sessionFactory.openSession();
             session.beginTransaction();
             return session.createQuery("from LastMessage where userBot="+userId, LastMessage.class).getSingleResult();
         }
@@ -40,46 +43,61 @@ public class LastMessageDAOimpl implements LastMessageDAO {
         catch (NonUniqueResultException a)
         {
             //если найденно несколько последных сообщений удаляем все и создаем новое
-            try(Session session = sessionFactory.getCurrentSession()) {
-                session.beginTransaction();
-                List<LastMessage> lastMessages = session.createQuery("from LastMessage where userBot="+userId, LastMessage.class).getResultList();
+            session = session.isOpen() ? session : sessionFactory.openSession();
+            session.beginTransaction();
+            List<LastMessage> lastMessages = session.createQuery("from LastMessage where userBot="+userId, LastMessage.class).getResultList();
 
-                for ( LastMessage lastMessage : lastMessages)
-                {
-                    session.delete(lastMessage);
-                }
-                session.getTransaction().commit();
-                return this.getLastMessage(userId);
+            for ( LastMessage lastMessage : lastMessages)
+            {
+                session.delete(lastMessage);
             }
+            session.getTransaction().commit();
+            return this.getLastMessage(userId);
+
+        }
+        finally {
+            session.close();
         }
     }
 
     @Override
     public void setLastMessage(LastMessage lastMessage) {
-        try(Session session = sessionFactory.getCurrentSession()) {
+        try {
             session.beginTransaction();
             session.save(lastMessage);
             session.getTransaction().commit();
+        }
+        finally {
+            session.close();
         }
     }
 
     @Override
     public void updateLastMessage(LastMessage lastMessage) {
-        try(Session session = sessionFactory.getCurrentSession()) {
+        //Session session = sessionFactory.getCurrentSession();
+        try {
+            session = sessionFactory.openSession();
             session.beginTransaction();
             LastMessage lastMessage1 = session.get(LastMessage.class, lastMessage.getId());
             lastMessage1.setLastMessageId(lastMessage.getLastMessageId());
             session.update(lastMessage1);
             session.getTransaction().commit();
         }
+        finally {
+            session.close();
+        }
     }
 
     @Override
     public void deleteLastMessage(LastMessage lastMessage) {
-        try(Session session = sessionFactory.getCurrentSession()) {
+        //Session session = sessionFactory.getCurrentSession();
+        try {
             session.beginTransaction();
             session.delete(lastMessage);
             session.getTransaction().commit();
+        }
+        finally {
+            session.close();
         }
     }
 }

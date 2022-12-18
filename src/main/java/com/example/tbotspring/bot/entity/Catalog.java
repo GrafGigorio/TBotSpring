@@ -3,22 +3,22 @@ package com.example.tbotspring.bot.entity;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "section")
-public class Section {
+@Table(name = "catalog")
+public class Catalog {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
-    private Long fatherid;
+    private Long fatherId;
     private String title;
     private Long shopId;
     private Long level;
 
-    public Section() {
+    public Catalog() {
     }
 
-    public Section(Long fatherid, String title, Long shopId, Long level) {
-        this.fatherid = fatherid;
+    public Catalog(Long fatherid, String title, Long shopId, Long level) {
+        this.fatherId = fatherid;
         this.title = title;
         this.shopId = shopId;
         this.level = level;
@@ -26,9 +26,9 @@ public class Section {
 
     @Override
     public String toString() {
-        return "section{" +
+        return "сatalog{" +
                 "id=" + id +
-                ", fatherid=" + fatherid +
+                ", fatherid=" + fatherId +
                 ", title='" + title + '\'' +
                 ", shopId=" + shopId +
                 ", level=" + level +
@@ -51,12 +51,12 @@ public class Section {
         this.id = id;
     }
 
-    public Long getFatherid() {
-        return fatherid;
+    public Long getFatherId() {
+        return fatherId;
     }
 
-    public void setFatherid(Long fatherid) {
-        this.fatherid = fatherid;
+    public void setFatherId(Long fatherid) {
+        this.fatherId = fatherid;
     }
 
     public String getTitle() {

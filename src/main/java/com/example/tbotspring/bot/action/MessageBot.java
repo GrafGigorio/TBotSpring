@@ -5,6 +5,7 @@ import com.example.tbotspring.bot.DAO.LastMessageDAO;
 import com.example.tbotspring.bot.DAO.LastMessageDAOimpl;
 import com.example.tbotspring.bot.DAO.UserBotDAO;
 import com.example.tbotspring.bot.DAO.UserBotDAOImpl;
+import com.example.tbotspring.bot.Proxy;
 import com.example.tbotspring.bot.entity.LastMessage;
 import com.example.tbotspring.bot.entity.UserBot;
 import com.example.tbotspring.bot.menu.Menu;

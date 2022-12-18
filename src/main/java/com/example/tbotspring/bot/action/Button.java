@@ -2,6 +2,7 @@ package com.example.tbotspring.bot.action;
 
 import com.example.tbotspring.StartBot;
 import com.example.tbotspring.bot.DAO.*;
+import com.example.tbotspring.bot.Proxy;
 import com.example.tbotspring.bot.Var;
 import com.example.tbotspring.bot.entity.Await;
 import com.example.tbotspring.bot.entity.LastMessage;
@@ -18,6 +19,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMa
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+import javax.xml.catalog.Catalog;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -27,7 +29,9 @@ public class Button {
     private LastMessageDAO lastMessageDAO = new LastMessageDAOimpl();
     private UserBotDAO userBotDAO = new UserBotDAOImpl();
     private AwaitDao awaitDao = new AwaitDAOimpl();
+    StoreDao storeDao = new StoreDAOimpl();
     private  Update update;
+
     public Button(StartBot startBot, Update update) {
         this.startBot = startBot;
         this.update = update;
@@ -36,13 +40,19 @@ public class Button {
     public void execute(Update update)
     {
         UserBot userBot = userBotDAO.getUserBot(update.getCallbackQuery().getFrom());
-        StoreDao storeDao = new StoreDAOimpl();
+
 
         Long objId = -1L;
+        Long objId2 = -1L;
+        Long objId3 = -1L;
         String mes = "";
         String[] comandSeq = update.getCallbackQuery().getData().split(":");
         if(comandSeq.length > 2)
         {
+            if(comandSeq.length > 3)
+                objId2 = Long.valueOf(comandSeq[3]);
+            if(comandSeq.length > 4)
+                objId3 = Long.valueOf(comandSeq[4]);
             objId = Long.valueOf(comandSeq[2]);
             mes = comandSeq[0]+":"+comandSeq[1]+":";
         }
@@ -59,6 +69,9 @@ public class Button {
 
         switch (mes)
         {
+            case Var.startMenu -> {
+                editMessage(chatId,callbackId,Var.getStartMenuTitle,msgId, Menu.getStartMenu(userBot.getId()));
+            }
             case Var.createStore -> {
                 Await await = new Await(userBot.getId(), Var.createStore);
                 awaitDao.set(await);
@@ -69,7 +82,7 @@ public class Button {
             }
             case Var.storeGet -> {
                 Store store = storeDao.getStore(objId);
-                editMessage(chatId,callbackId,"Меню магазана " + store.getTitle(),msgId, Menu.getStoreMenu(store));
+                editMessage(chatId,callbackId,"Меню магазана " + store.getTitle(),msgId, Menu.getStoreMenu(store,objId2,objId3));
             }
             case Var.storeEdit -> {
                 Await await = new Await(userBot.getId(), Var.storeEdit + objId );
@@ -84,8 +97,17 @@ public class Button {
                 lastMessage.setLastMessageId(message.getMessageId());
                 lastMessageDAO.updateLastMessage(lastMessage);
             }
-            case Var.startMenu -> {
-                editMessage(chatId,callbackId,Var.getStartMenuTitle,msgId, Menu.getStartMenu(userBot.getId()));
+            case Var.catalogGet -> {
+                Store store = storeDao.getStore(objId);
+                editMessage(chatId,callbackId,"Меню каталога " + store.getTitle(),msgId, Menu.getCatalogMenu(objId,objId2,objId3));
+            }
+            case Var.catalogCreate -> {
+                //В данной ситуации objId это id магазина
+                //а objId2 это id родительского catalog
+
+                Await await = new Await(userBot.getId(), Var.catalogCreate+objId+":"+objId2+":"+objId3);
+                awaitDao.set(await);
+                editMessage(chatId,callbackId,"Введите название нового каталога!",msgId);
             }
         }
     }
