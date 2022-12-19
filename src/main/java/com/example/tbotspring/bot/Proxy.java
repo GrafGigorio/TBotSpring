@@ -72,7 +72,7 @@ public class Proxy {
                 if(comandSeq.length > 3)
                     objId2 = Long.valueOf(comandSeq[3]);
                 if(comandSeq.length > 4)
-                    objId3 = Long.valueOf(comandSeq[3]);
+                    objId3 = Long.valueOf(comandSeq[4]);
                 objId = Long.valueOf(comandSeq[2]);
                 mes = comandSeq[0]+":"+comandSeq[1]+":";
             }
@@ -106,7 +106,18 @@ public class Proxy {
                     lastMessageDAO.updateLastMessage(lastMessage);
                 }
                 case Var.catalogCreate -> {
-                    Catalog catalog = new Catalog(objId2,update.getMessage().getText(),objId,-1L);
+                    Catalog catalog = null;
+                    if(objId3 != -1L)
+                    {
+                        catalog = new Catalog(update.getMessage().getText(),objId,objId3,-1L);
+                    } else
+                    if(objId2 == -1L)
+                    {
+                        catalog = new Catalog(update.getMessage().getText(),objId,objId2,-1L);
+                    }
+
+                    
+                    
                     catalogDAO.set(catalog);
                     awaitDao.delete(await);
                     messageBot.sendMessage("Каталог " + update.getMessage().getText() + " успешно созданн!");

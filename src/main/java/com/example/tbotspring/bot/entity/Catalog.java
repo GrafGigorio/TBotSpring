@@ -17,7 +17,7 @@ public class Catalog {
     public Catalog() {
     }
 
-    public Catalog(Long fatherid, String title, Long shopId, Long level) {
+    public Catalog(String title, Long shopId, Long fatherid, Long level) {
         this.fatherId = fatherid;
         this.title = title;
         this.shopId = shopId;
@@ -26,9 +26,9 @@ public class Catalog {
 
     @Override
     public String toString() {
-        return "сatalog{" +
+        return "Catalog{" +
                 "id=" + id +
-                ", fatherid=" + fatherId +
+                ", fatherId=" + fatherId +
                 ", title='" + title + '\'' +
                 ", shopId=" + shopId +
                 ", level=" + level +

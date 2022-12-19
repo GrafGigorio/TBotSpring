@@ -206,6 +206,8 @@ public class Menu {
                         .callbackData(Var.catalogCreate+shopId+":"+parentId+":"+catalogId)
                         .build()
         ));
+        //Переименовать
+        //Удалить
         if(parentId == -1L)
             storeLines.add(List.of(
                     InlineKeyboardButton

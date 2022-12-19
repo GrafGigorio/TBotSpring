@@ -20,12 +20,16 @@ public class Var {
     public static final String catalogGetChildTitle = "Список дочерних каталогов";
     public static final String catalogEdit = "catalog:edit:";
     public static final String catalogDelete = "catalog:delete:";
-    public static final SessionFactory sessionFactory = new Configuration()
+    public static SessionFactory sessionFactory = getSessionFactory();
+    public static SessionFactory getSessionFactory()
+    {
+        return new Configuration()
                 .configure()
-                .addAnnotatedClass(LastMessage .class)
-                .addAnnotatedClass(UserBot .class)
-                .addAnnotatedClass(Store .class)
-                .addAnnotatedClass(Await .class)
-                .addAnnotatedClass(Catalog .class)
+                .addAnnotatedClass(LastMessage.class)
+                .addAnnotatedClass(UserBot.class)
+                .addAnnotatedClass(Store.class)
+                .addAnnotatedClass(Await.class)
+                .addAnnotatedClass(Catalog.class)
                 .buildSessionFactory();
+    }
 }

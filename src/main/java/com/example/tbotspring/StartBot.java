@@ -2,6 +2,9 @@ package com.example.tbotspring;
 
 
 import com.example.tbotspring.bot.Proxy;
+import com.example.tbotspring.bot.Var;
+import com.example.tbotspring.bot.entity.*;
+import org.hibernate.cfg.Configuration;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
@@ -11,6 +14,7 @@ import java.util.List;
 
 @Component
 public class StartBot extends TelegramLongPollingBot {
+
 
     @Value("${bot.username}")
     private String username;
@@ -25,11 +29,8 @@ public class StartBot extends TelegramLongPollingBot {
 
     @Override
     public void onUpdateReceived(Update update) {
-
         Proxy proxy = new Proxy(this);
         proxy.proxy(update);
-
-
     }
 
     @Override
