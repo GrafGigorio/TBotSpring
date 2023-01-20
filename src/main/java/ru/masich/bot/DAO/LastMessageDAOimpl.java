@@ -59,7 +59,9 @@ public class LastMessageDAOimpl implements LastMessageDAO {
     @Override
     public void setLastMessage(LastMessage lastMessage) {
         try {
+            session = sessionFactory.openSession();
             session.beginTransaction();
+
             session.save(lastMessage);
             session.getTransaction().commit();
         }
@@ -74,9 +76,16 @@ public class LastMessageDAOimpl implements LastMessageDAO {
         try {
             session = sessionFactory.openSession();
             session.beginTransaction();
+
             LastMessage lastMessage1 = session.get(LastMessage.class, lastMessage.getId());
-            lastMessage1.setLastMessageId(lastMessage.getLastMessageId());
-            session.update(lastMessage1);
+            if(lastMessage1 != null)
+            {
+                lastMessage1.setLastMessageId(lastMessage.getLastMessageId());
+                session.update(lastMessage1);
+            }
+            else {
+                session.save(lastMessage);
+            }
             session.getTransaction().commit();
         }
         finally {

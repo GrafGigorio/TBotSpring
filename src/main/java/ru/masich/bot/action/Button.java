@@ -181,6 +181,7 @@ public class Button {
     }
     private void editMessage(Long chatId, String queryId, String title, int msgId, InlineKeyboardMarkup menu) {
 
+        //--msgId;
         EditMessageText newTxt = EditMessageText.builder()
                 .chatId(chatId.toString())
                 .messageId(msgId).text(title).build();

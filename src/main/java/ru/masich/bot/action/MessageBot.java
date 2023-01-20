@@ -1,5 +1,9 @@
 package ru.masich.bot.action;
 
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.objects.Message;
+import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import ru.masich.StartBot;
 import ru.masich.bot.DAO.LastMessageDAO;
 import ru.masich.bot.DAO.LastMessageDAOimpl;
@@ -8,10 +12,6 @@ import ru.masich.bot.DAO.UserBotDAOImpl;
 import ru.masich.bot.entity.LastMessage;
 import ru.masich.bot.entity.UserBot;
 import ru.masich.bot.menu.Menu;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.api.objects.Message;
-import org.telegram.telegrambots.meta.api.objects.Update;
-import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 public class MessageBot {
     private StartBot startBot;
@@ -31,14 +31,17 @@ public class MessageBot {
         Message message = this.sendMenu(Menu.getStartMenu(userBot));
 
         LastMessage lastMessage = lastMessageDAO.getLastMessage(userBotDAO.getUserBot(update.getMessage().getFrom()).getId());
-        if(lastMessage != null)
+
+        if(lastMessage == null)
         {
-            lastMessage.setLastMessageId(Long.valueOf(message.getMessageId()));
-            lastMessageDAO.updateLastMessage(lastMessage);
+            lastMessage = new LastMessage(userBot,message.getMessageId());
+            lastMessageDAO.setLastMessage(lastMessage);
             return;
         }
 
-        lastMessageDAO.setLastMessage(new LastMessage(userBot,message.getMessageId()));
+        lastMessage.setLastMessageId(message.getMessageId());
+        lastMessageDAO.updateLastMessage(lastMessage);
+
     }
     public Message sendMessage(String mes)
     {
