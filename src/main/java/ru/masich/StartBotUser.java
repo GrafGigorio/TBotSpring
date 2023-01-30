@@ -1,21 +1,22 @@
 package ru.masich;
 
-
-import ru.masich.bot.Proxy;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import ru.masich.bot.ProxyClient;
 
 import java.util.List;
 
 @Component
-public class StartBot extends TelegramLongPollingBot {
+public class StartBotUser extends TelegramLongPollingBot {
 
-    @Value("${bot.username}")
+
+    public Update update;
+    @Value("${bot.client.username}")
     private String username;
 
-    @Value("${bot.token}")
+    @Value("${bot.client.token}")
     private String token;
 
     @Override
@@ -25,8 +26,9 @@ public class StartBot extends TelegramLongPollingBot {
 
     @Override
     public void onUpdateReceived(Update update) {
-        Proxy proxy = new Proxy(this);
-        proxy.proxy(update);
+        this.update = update;
+        ProxyClient proxy = new ProxyClient(this);
+        proxy.proxy();
     }
 
     @Override
@@ -43,5 +45,7 @@ public class StartBot extends TelegramLongPollingBot {
     public String getBotToken() {
         return token;
     }
+
+
 
 }

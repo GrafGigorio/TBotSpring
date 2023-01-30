@@ -30,7 +30,6 @@ public class Proxy {
 
     public Proxy(StartBot startBot) {
         this.startBot = startBot;
-
     }
 
     public void proxy(Update update)
@@ -40,13 +39,9 @@ public class Proxy {
 
         //Проверряем наличие отложенных заданий(В случаях где от пользователя ожидается получение названия какого либо обьекта)
 
-
-
         List<Await> awaits = awaitDao.getAll(userBot.getId());
         MessageBot messageBot = new MessageBot(startBot,update,userBot);
         Button button = new Button(startBot,update);
-
-
 
         if(awaits.size() > 0)
         {
@@ -111,11 +106,11 @@ public class Proxy {
                     Catalog catalog = null;
                     if(objId3 != -1L)
                     {
-                        catalog = new Catalog(update.getMessage().getText(),objId,objId3,-1L);
+                        catalog = new Catalog(update.getMessage().getText(),objId,objId3,-1L,null);
                     } else
                     if(objId2 == -1L)
                     {
-                        catalog = new Catalog(update.getMessage().getText(),objId,objId2,-1L);
+                        catalog = new Catalog(update.getMessage().getText(),objId,objId2,-1L,null);
                     }
 
                     catalogDAO.set(catalog);

@@ -35,8 +35,6 @@ public class UserBot {
 //    @Transient
 //    private AwaitDao awaitDao = new AwaitDAOimpl();
 
-
-
     public UserBot() {
     }
 

@@ -1,6 +1,7 @@
 package ru.masich.bot.entity;
 
 import javax.persistence.*;
+import java.util.Map;
 
 @Entity
 @Table(name = "catalog")
@@ -13,15 +14,17 @@ public class Catalog {
     private String title;
     private Long shopId;
     private Long level;
-
+    @Convert(converter = HashMapConverter.class)
+    private Map<String, Object> catalog_atributes;
     public Catalog() {
     }
 
-    public Catalog(String title, Long shopId, Long fatherid, Long level) {
+    public Catalog(String title, Long shopId, Long fatherid, Long level, Map<String, Object> catalog_atributes ) {
         this.fatherId = fatherid;
         this.title = title;
         this.shopId = shopId;
         this.level = level;
+        this.catalog_atributes = catalog_atributes;
     }
 
     @Override
@@ -32,7 +35,16 @@ public class Catalog {
                 ", title='" + title + '\'' +
                 ", shopId=" + shopId +
                 ", level=" + level +
+                ", product_attributes=" + catalog_atributes +
                 '}';
+    }
+
+    public Map<String, Object> getCatalog_atributes() {
+        return catalog_atributes;
+    }
+
+    public void setCatalog_atributes(Map<String, Object> catalog_atributes) {
+        this.catalog_atributes = catalog_atributes;
     }
 
     public Long getLevel() {

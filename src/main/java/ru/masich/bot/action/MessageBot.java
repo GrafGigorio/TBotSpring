@@ -27,6 +27,10 @@ public class MessageBot {
 
     public void execute(Update update)
     {
+        //Проверяем пользователя на наличие его в наших списках
+        //getFrom(update);
+
+
         this.sendMessage("Команда: " + update.getMessage().getText() + " не распознанна!");
         Message message = this.sendMenu(Menu.getStartMenu(userBot));
 

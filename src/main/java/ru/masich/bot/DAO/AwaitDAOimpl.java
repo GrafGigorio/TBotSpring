@@ -51,6 +51,11 @@ public class AwaitDAOimpl implements AwaitDao {
             session.beginTransaction();
             return session.createQuery("from Await where userid="+userid, Await.class).getSingleResult();
         }
+        catch (javax.persistence.NoResultException e)
+        {
+            System.out.println(e);
+            return null;
+        }
         finally {
             session.close();
         }

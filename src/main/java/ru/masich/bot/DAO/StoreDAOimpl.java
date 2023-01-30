@@ -20,6 +20,7 @@ public class StoreDAOimpl implements StoreDao{
     public List<Store> getAllStore() {
         //Session session = sessionFactory.getCurrentSession();
         try {
+            session = sessionFactory.openSession();
             session.beginTransaction();
             return session.createQuery("from Store", Store.class).getResultList();
         }
@@ -58,6 +59,7 @@ public class StoreDAOimpl implements StoreDao{
     public Store saveOrUpdateStore(Store store) {
         //Session session = sessionFactory.getCurrentSession();
         try {
+            session = sessionFactory.openSession();
             session.beginTransaction();
             session.saveOrUpdate(store);
             session.getTransaction().commit();
@@ -72,6 +74,7 @@ public class StoreDAOimpl implements StoreDao{
     public Store deleteStore(Store store) {
         //Session session = sessionFactory.getCurrentSession();
         try {
+            session = sessionFactory.openSession();
             session.beginTransaction();
             session.delete(store);
             session.getTransaction().commit();

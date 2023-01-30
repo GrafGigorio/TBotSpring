@@ -5,6 +5,7 @@ import ru.masich.bot.entity.Catalog;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class CatalogDAOimpl implements CatalogDAO {
@@ -21,6 +22,10 @@ public class CatalogDAOimpl implements CatalogDAO {
             session = sessionFactory.openSession();
             session.beginTransaction();
             return session.createQuery("from Catalog where shopId="+shopid, Catalog.class).getResultList();
+        }
+        catch (javax.persistence.PersistenceException ea)
+        {
+            return new ArrayList<Catalog>();
         }
         finally {
             session.close();
@@ -54,6 +59,7 @@ public class CatalogDAOimpl implements CatalogDAO {
     @Override
     public void set(Catalog section) {
         try {
+            session = sessionFactory.openSession();
             session.beginTransaction();
             session.save(section);
             session.getTransaction().commit();
