@@ -1,5 +1,6 @@
-package ru.masich.bot.DAO;
+package ru.masich.bot.DAO.IMPL;
 
+import ru.masich.bot.DAO.interfaces.CatalogDAO;
 import ru.masich.bot.Var;
 import ru.masich.bot.entity.Catalog;
 import org.hibernate.Session;
@@ -50,6 +51,34 @@ public class CatalogDAOimpl implements CatalogDAO {
             session = sessionFactory.openSession();
             session.beginTransaction();
             return session.get(Catalog.class, catalogID);
+        }
+        finally {
+            session.close();
+        }
+    }
+    @Override
+    public Catalog get(int catalogID) {
+        try {
+            session = sessionFactory.openSession();
+            session.beginTransaction();
+            return session.get(Catalog.class, catalogID);
+        }
+        finally {
+            session.close();
+        }
+    }
+    @Override
+    public Catalog get(String catalogID) {
+        try {
+            session = sessionFactory.openSession();
+            session.beginTransaction();
+
+            return session.get(Catalog.class, Long.valueOf(catalogID));
+        }
+        catch (Exception d)
+        {
+            System.out.println(catalogID);
+            throw d;
         }
         finally {
             session.close();

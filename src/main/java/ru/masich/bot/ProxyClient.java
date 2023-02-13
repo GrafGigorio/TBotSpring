@@ -1,15 +1,16 @@
 package ru.masich.bot;
 
 import org.telegram.telegrambots.meta.api.objects.User;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import ru.masich.StartBotUser;
 import ru.masich.bot.Client.ClientAwait;
-import ru.masich.bot.Client.ClientButtun;
+import ru.masich.bot.Client.ClientButton;
 import ru.masich.bot.Client.ClientMessage;
 import ru.masich.bot.Client.ClientPreCheckoutQuery;
-import ru.masich.bot.DAO.AwaitDAOimpl;
-import ru.masich.bot.DAO.AwaitDao;
-import ru.masich.bot.DAO.UserBotDAO;
-import ru.masich.bot.DAO.UserBotDAOImpl;
+import ru.masich.bot.DAO.IMPL.AwaitDAOimpl;
+import ru.masich.bot.DAO.interfaces.AwaitDao;
+import ru.masich.bot.DAO.interfaces.UserBotDAO;
+import ru.masich.bot.DAO.IMPL.UserBotDAOImpl;
 import ru.masich.bot.entity.Await;
 import ru.masich.bot.entity.UserBot;
 
@@ -24,8 +25,7 @@ public class ProxyClient {
         this.startBotUser = startBotUser;
     }
 
-    public void proxy()
-    {
+    public void proxy() throws TelegramApiException {
         //Предчек
         if(startBotUser.update.hasPreCheckoutQuery()) {
             getFrom(startBotUser.update.getPreCheckoutQuery().getFrom());
@@ -41,7 +41,7 @@ public class ProxyClient {
         //если была нажата конка
         if(startBotUser.update.hasCallbackQuery()) {
             getFrom(startBotUser.update.getCallbackQuery().getFrom());
-            ClientButtun.execute(this);
+            ClientButton.execute(this);
             return;
         }
         //Если сообщение

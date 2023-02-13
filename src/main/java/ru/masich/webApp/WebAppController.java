@@ -4,8 +4,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import ru.masich.bot.DAO.UserBotDAO;
-import ru.masich.bot.DAO.UserBotDAOImpl;
+import ru.masich.bot.DAO.interfaces.UserBotDAO;
+import ru.masich.bot.DAO.IMPL.UserBotDAOImpl;
 import ru.masich.bot.entity.UserBot;
 
 @Controller

@@ -1,5 +1,6 @@
-package ru.masich.bot.DAO;
+package ru.masich.bot.DAO.IMPL;
 
+import ru.masich.bot.DAO.interfaces.StoreDao;
 import ru.masich.bot.Var;
 import ru.masich.bot.entity.Store;
 import org.hibernate.Session;
@@ -7,7 +8,7 @@ import org.hibernate.SessionFactory;
 
 import java.util.List;
 
-public class StoreDAOimpl implements StoreDao{
+public class StoreDAOimpl implements StoreDao {
     SessionFactory sessionFactory;
     Session session;
 

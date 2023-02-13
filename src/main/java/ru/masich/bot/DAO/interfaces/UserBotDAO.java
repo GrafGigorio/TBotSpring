@@ -1,4 +1,4 @@
-package ru.masich.bot.DAO;
+package ru.masich.bot.DAO.interfaces;
 
 import ru.masich.bot.entity.UserBot;
 import org.telegram.telegrambots.meta.api.objects.User;

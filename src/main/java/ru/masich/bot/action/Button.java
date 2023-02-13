@@ -9,7 +9,8 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import ru.masich.StartBot;
-import ru.masich.bot.DAO.*;
+import ru.masich.bot.DAO.IMPL.*;
+import ru.masich.bot.DAO.interfaces.*;
 import ru.masich.bot.Var;
 import ru.masich.bot.entity.*;
 import ru.masich.bot.menu.Menu;
@@ -180,7 +181,6 @@ public class Button {
         }
     }
     private void editMessage(Long chatId, String queryId, String title, int msgId, InlineKeyboardMarkup menu) {
-
         //--msgId;
         EditMessageText newTxt = EditMessageText.builder()
                 .chatId(chatId.toString())

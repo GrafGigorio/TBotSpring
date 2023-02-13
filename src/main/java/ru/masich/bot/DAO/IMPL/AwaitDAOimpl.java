@@ -1,7 +1,8 @@
-package ru.masich.bot.DAO;
+package ru.masich.bot.DAO.IMPL;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import ru.masich.bot.DAO.interfaces.AwaitDao;
 import ru.masich.bot.Var;
 import ru.masich.bot.entity.Await;
 

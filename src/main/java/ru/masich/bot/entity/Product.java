@@ -30,7 +30,7 @@ public class Product {
                 "id=" + id +
                 ", shopId=" + shopId +
                 ", catalogId=" + catalogId +
-                ", customerAttributes=" + productAttributes +
+                ", productAttributes=" + productAttributes +
                 '}';
     }
 

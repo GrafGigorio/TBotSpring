@@ -1,5 +1,6 @@
-package ru.masich.bot.DAO;
+package ru.masich.bot.DAO.IMPL;
 
+import ru.masich.bot.DAO.interfaces.LastMessageDAO;
 import ru.masich.bot.Var;
 import ru.masich.bot.entity.LastMessage;
 import org.hibernate.Session;

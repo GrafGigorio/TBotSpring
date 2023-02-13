@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import ru.masich.bot.ProxyClient;
 
 import java.util.List;
@@ -28,7 +29,12 @@ public class StartBotUser extends TelegramLongPollingBot {
     public void onUpdateReceived(Update update) {
         this.update = update;
         ProxyClient proxy = new ProxyClient(this);
-        proxy.proxy();
+
+        try {
+            proxy.proxy();
+        } catch (TelegramApiException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override

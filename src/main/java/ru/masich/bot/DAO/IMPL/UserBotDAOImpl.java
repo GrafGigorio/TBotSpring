@@ -1,15 +1,16 @@
-package ru.masich.bot.DAO;
+package ru.masich.bot.DAO.IMPL;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.springframework.stereotype.Repository;
 import org.telegram.telegrambots.meta.api.objects.User;
+import ru.masich.bot.DAO.interfaces.UserBotDAO;
 import ru.masich.bot.Var;
 import ru.masich.bot.entity.UserBot;
 
 import java.util.List;
 @Repository
-public class UserBotDAOImpl implements UserBotDAO{
+public class UserBotDAOImpl implements UserBotDAO {
 //    @Autowired
 //    SessionFactory sessionFactory;
 

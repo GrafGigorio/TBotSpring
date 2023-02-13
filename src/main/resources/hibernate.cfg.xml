@@ -19,6 +19,7 @@
         <mapping class="ru.masich.bot.entity.Product"/>
         <mapping class="ru.masich.bot.entity.Store"/>
         <mapping class="ru.masich.bot.entity.UserBot"/>
+        <mapping class="ru.masich.bot.entity.ObjectSend"/>
 
     </session-factory>
 </hibernate-configuration>
