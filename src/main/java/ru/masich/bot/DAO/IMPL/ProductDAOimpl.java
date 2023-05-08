@@ -58,7 +58,7 @@ public class ProductDAOimpl implements ProductDAO {
         try {
             session = sessionFactory.openSession();
             session.beginTransaction();
-            session.save(product);
+            session.saveOrUpdate(product);
             session.getTransaction().commit();
         }
         finally {

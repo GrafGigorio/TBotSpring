@@ -11,7 +11,7 @@ import ru.masich.bot.DAO.interfaces.UserBotDAO;
 import ru.masich.bot.DAO.IMPL.UserBotDAOImpl;
 import ru.masich.bot.entity.LastMessage;
 import ru.masich.bot.entity.UserBot;
-import ru.masich.bot.menu.Menu;
+import ru.masich.bot.menu.CatalogMenu;
 
 public class MessageBot {
     private StartBot startBot;
@@ -32,7 +32,7 @@ public class MessageBot {
 
 
         this.sendMessage("Команда: " + update.getMessage().getText() + " не распознанна!");
-        Message message = this.sendMenu(Menu.getStartMenu(userBot));
+        Message message = this.sendMenu(CatalogMenu.getStartMenu(userBot));
 
         LastMessage lastMessage = lastMessageDAO.getLastMessage(userBotDAO.getUserBot(update.getMessage().getFrom()).getId());
 

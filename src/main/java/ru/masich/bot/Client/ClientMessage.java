@@ -11,6 +11,7 @@ import org.telegram.telegrambots.meta.api.objects.payments.LabeledPrice;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import ru.masich.bot.ProxyClient;
+import ru.masich.bot.menu.ChartMenu;
 import ru.masich.bot.menu.MenuClient;
 
 import java.util.ArrayList;
@@ -38,8 +39,11 @@ public class ClientMessage {
             MenuClient.sendStartMenu(proxyClient.userBot, retMes, ProxyClient.shopID);
         }
 
-
-
+        if(mes.equals("/chart"))
+        {
+            retMes = proxyClient.userBot.getFirstName()+", вот ваша корзина:";
+            ChartMenu.sendActiveChart(proxyClient.userBot, retMes);
+        }
     }
     static public Message sendMessage(String mes)
     {

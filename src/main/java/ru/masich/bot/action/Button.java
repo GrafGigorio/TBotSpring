@@ -12,16 +12,18 @@ import ru.masich.StartBot;
 import ru.masich.bot.DAO.IMPL.*;
 import ru.masich.bot.DAO.interfaces.*;
 import ru.masich.bot.Var;
+import ru.masich.bot.action.store.Download;
+import ru.masich.bot.action.store.Upload;
 import ru.masich.bot.entity.*;
-import ru.masich.bot.menu.Menu;
+import ru.masich.bot.menu.CatalogMenu;
 
 public class Button {
-    private StartBot startBot;
+    public StartBot startBot;
     private LastMessageDAO lastMessageDAO = new LastMessageDAOimpl();
     private UserBotDAO userBotDAO = new UserBotDAOImpl();
     private AwaitDao awaitDao = new AwaitDAOimpl();
     StoreDao storeDao = new StoreDAOimpl();
-    private  Update update;
+    public Update update;
 
     public Button(StartBot startBot, Update update) {
         this.startBot = startBot;
@@ -61,7 +63,7 @@ public class Button {
         switch (mes)
         {
             case Var.startMenu -> {
-                editMessage(chatId,callbackId,Var.getStartMenuTitle,msgId, Menu.getStartMenu(userBot.getId()));
+                editMessage(chatId,callbackId,Var.getStartMenuTitle,msgId, CatalogMenu.getStartMenu(userBot.getId()));
             }
             case Var.createStore -> {
                 Await await = new Await(userBot.getId(), Var.createStore);
@@ -69,11 +71,11 @@ public class Button {
                 editMessage(chatId,callbackId,"Введите название нового магазина!",msgId);
             }
             case Var.getMyStores -> {
-                editMessage(chatId,callbackId,"Список магазинов",msgId, Menu.getStoresList(userBot.getId()));
+                editMessage(chatId,callbackId,"Список магазинов",msgId, CatalogMenu.getStoresList(userBot.getId()));
             }
             case Var.storeGet -> {
                 Store store = storeDao.getStore(objId);
-                editMessage(chatId,callbackId,"Меню магазана " + store.getTitle(),msgId, Menu.getStoreMenu(store,objId2,objId3));
+                editMessage(chatId,callbackId,"Меню магазана " + store.getTitle(),msgId, CatalogMenu.getStoreMenu(store,objId2,objId3));
             }
             case Var.storeEdit -> {
                 Await await = new Await(userBot.getId(), Var.storeEdit + objId );
@@ -84,7 +86,7 @@ public class Button {
                 Store store = storeDao.getStore(objId);
                 storeDao.deleteStore(store);
                 editMessage(chatId,callbackId,"Магазин #"+store.getId() +" "+store.getTitle() + " удален!", msgId);
-                Message message = sendMenu(userBot.getTgId(),Var.getStoresTitle,Menu.getStoresList(userBot.getId()));
+                Message message = sendMenu(userBot.getTgId(),Var.getStoresTitle, CatalogMenu.getStoresList(userBot.getId()));
                 lastMessage.setLastMessageId(message.getMessageId());
                 lastMessageDAO.updateLastMessage(lastMessage);
             }
@@ -107,7 +109,7 @@ public class Button {
                 {
                     title = "Меню магазина " + storeDao.getStore(objId).getTitle();
                 }
-                editMessage(chatId,callbackId,title,msgId, Menu.getCatalogMenu(objId, objId2, objId3, title));
+                editMessage(chatId,callbackId,title,msgId, CatalogMenu.getCatalogMenu(objId, objId2, objId3, title));
             }
             case Var.catalogEdit -> {
                 Await await = new Await(userBot.getId(), Var.catalogEdit + objId );
@@ -115,20 +117,20 @@ public class Button {
                 editMessage(chatId,callbackId,"В ведите новое название магазина", msgId);
             }
             case Var.catalogDelete -> {
-                Catalog catalog = catalogDAO.get(objId);
+                ru.masich.bot.entity.Catalog catalog = catalogDAO.get(objId);
                 Long fat = catalog.getFatherId();
                 catalogDAO.delete(catalog);
-                Catalog par = catalogDAO.get(fat);
+                ru.masich.bot.entity.Catalog par = catalogDAO.get(fat);
                 InlineKeyboardMarkup inlineKeyboardMarkup = null;
                 String title = "";
                 //Если корневой каталог выводи его содержимое если нет то выводим список на уровень выше
                 if(fat == null || fat == -1)
                 {
-                    inlineKeyboardMarkup = Menu.getStoresList(catalog.getShopId());
+                    inlineKeyboardMarkup = CatalogMenu.getStoresList(catalog.getShopId());
                     title = Var.catalogGetMasterTitle +" " +storeDao.getStore(catalog.getShopId()).getTitle();
                 }
                 else {
-                    inlineKeyboardMarkup = Menu.getCatalogMenu(par.getShopId(),par.getFatherId(),-1L,par.getTitle());
+                    inlineKeyboardMarkup = CatalogMenu.getCatalogMenu(par.getShopId(),par.getFatherId(),-1L,par.getTitle());
                     title = Var.getStoresTitle +" " +storeDao.getStore(par.getShopId()).getTitle();
                 }
                 editMessage(chatId,callbackId,"Каталог #"+catalog.getId() +" "+catalog.getTitle() + " удален!", msgId);
@@ -145,6 +147,24 @@ public class Button {
                 Await await = new Await(userBot.getId(), Var.productCreate+objId+":"+objId2);
                 awaitDao.set(await);
                 editMessage(chatId,callbackId,"Введите название товара!",msgId);
+            }
+            //Отправка в гугл таблици
+            case "store:upload:" -> {
+                Upload upload = new Upload(this, Integer.parseInt(comandSeq[2]));
+                upload.execute();
+            }
+            //Получить из гугл таблиц
+            case "store:download:" -> {
+                Download download = new Download(this, Integer.parseInt(comandSeq[2]));
+                download.execute();
+                //Обновляем таблицу после изменений
+                Upload upload = new Upload(this, Integer.parseInt(comandSeq[2]));
+                upload.execute();
+            }
+            //Проверить на изменения
+            case "store:check:" -> {
+                Download download = new Download(this, Integer.parseInt(comandSeq[2]));
+                download.check();
             }
         }
     }

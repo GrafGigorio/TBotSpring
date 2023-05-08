@@ -10,7 +10,6 @@ import ru.masich.bot.DAO.interfaces.CatalogDAO;
 import ru.masich.bot.DAO.interfaces.ProductDAO;
 import ru.masich.bot.DAO.interfaces.StoreDao;
 import ru.masich.bot.Var;
-import ru.masich.bot.entity.Catalog;
 import ru.masich.bot.entity.Product;
 import ru.masich.bot.entity.Store;
 import ru.masich.bot.entity.UserBot;
@@ -18,7 +17,7 @@ import ru.masich.bot.entity.UserBot;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Menu {
+public class CatalogMenu {
     private static List<List<InlineKeyboardButton>> storeLines = new ArrayList<>();
     private static CatalogDAO catalogDAO = new CatalogDAOimpl();
     private static StoreDao storeDao = new StoreDAOimpl();
@@ -131,6 +130,37 @@ public class Menu {
                 .callbackData(Var.storeDelete + store.getId())
                 .build());
         storeLines.add(line);
+
+        storeLines.add(List.of(
+
+                InlineKeyboardButton
+                .builder()
+                        .url("https://docs.google.com/spreadsheets/d/1U-SBrEWiB8jI4ASeiDIQMu75NTWOxadhYCKroVhCQNE/")
+                .text("\uD83D\uDD17 Открыть гугл таблицы \uD83D\uDD17")
+                .build()
+        ));
+        storeLines.add(List.of(
+                InlineKeyboardButton
+                .builder()
+                .text("⬆\uFE0F Сбросить изменения в таблицах ⬆\uFE0F")
+                .callbackData("store:upload:"+store.getId())
+                .build()
+        ));
+        storeLines.add(List.of(
+                InlineKeyboardButton
+                .builder()
+                .text("⬇\uFE0F Принять изменения из гугл таблиц ⬇\uFE0F")
+                .callbackData("store:download:"+store.getId())
+                .build()
+        ));
+        storeLines.add(List.of(
+                InlineKeyboardButton
+                        .builder()
+                        .text("✅\uFE0F Проверить результат загрузки в программу✅\uFE0F")
+                        .callbackData("store:check:"+store.getId())
+                        .build()
+        ));
+
         storeLines.add(List.of(
                 InlineKeyboardButton
                 .builder()
@@ -149,7 +179,7 @@ public class Menu {
         //Если указан parentId то это родительский каталог других каталогов
         //Если указан только shopId то это список каталога верхнего уровня
         storeLines = new ArrayList<>();
-        List<Catalog> catalogs = new ArrayList<>();
+        List<ru.masich.bot.entity.Catalog> catalogs = new ArrayList<>();
         List<Product> products = new ArrayList<>();
         ProductDAO productDAO = new ProductDAOimpl();
 
@@ -163,7 +193,7 @@ public class Menu {
         }
 
 
-        for (Catalog catalog : catalogs)
+        for (ru.masich.bot.entity.Catalog catalog : catalogs)
         {
             storeLines.add(List.of(
                     InlineKeyboardButton

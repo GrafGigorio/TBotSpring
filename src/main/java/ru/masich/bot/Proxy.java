@@ -12,7 +12,7 @@ import ru.masich.bot.DAO.interfaces.*;
 import ru.masich.bot.action.Button;
 import ru.masich.bot.action.MessageBot;
 import ru.masich.bot.entity.*;
-import ru.masich.bot.menu.Menu;
+import ru.masich.bot.menu.CatalogMenu;
 
 import java.util.HashMap;
 import java.util.List;
@@ -50,7 +50,7 @@ public class Proxy {
             if(update.getMessage() == null)
             {
                 messageBot.sendMessage("Отложенная команда: " + await.getCommand() + " не распознанна!");
-                Message message = messageBot.sendMenu(Menu.getStartMenu(userBot));
+                Message message = messageBot.sendMenu(CatalogMenu.getStartMenu(userBot));
                 LastMessage lastMessage = lastMessageDAO.getLastMessage(userBot.getId());
                 lastMessage.setLastMessageId(message.getMessageId());
                 lastMessageDAO.updateLastMessage(lastMessage);
@@ -88,7 +88,7 @@ public class Proxy {
                     storeDao.saveOrUpdateStore(store);
                     awaitDao.delete(await);
                     messageBot.sendMessage("Магазин " + update.getMessage().getText() + " успешно созданн!");
-                    messageBot.sendMenu(Menu.getStartMenu(userBot));
+                    messageBot.sendMenu(CatalogMenu.getStartMenu(userBot));
                 }
                 //Переименовывание магазина
                 case Var.storeEdit -> {
@@ -97,32 +97,32 @@ public class Proxy {
                     store.setTitle(update.getMessage().getText());
                     storeDao.saveOrUpdateStore(store);
                     messageBot.sendMessage("Магазин #"+ store.getId() + "  переименован на "+store.getTitle());
-                    Message message = sendMenu(userBot.getTgId(),Var.getStoresTitle,Menu.getStoresList(userBot));
+                    Message message = sendMenu(userBot.getTgId(),Var.getStoresTitle, CatalogMenu.getStoresList(userBot));
 
                     LastMessage lastMessage = lastMessageDAO.getLastMessage(userBot.getId());
                     lastMessage.setLastMessageId(message.getMessageId().longValue());
                     lastMessageDAO.updateLastMessage(lastMessage);
                 }
                 case Var.catalogCreate -> {
-                    Catalog catalog = null;
+                    ru.masich.bot.entity.Catalog catalog = null;
                     if(objId3 != -1L)
                     {
-                        catalog = new Catalog(update.getMessage().getText(),objId,objId3,-1L,null);
+                        catalog = new ru.masich.bot.entity.Catalog(update.getMessage().getText(),objId,objId3,-1L,null);
                     } else
                     if(objId2 == -1L)
                     {
-                        catalog = new Catalog(update.getMessage().getText(),objId,objId2,-1L,null);
+                        catalog = new ru.masich.bot.entity.Catalog(update.getMessage().getText(),objId,objId2,-1L,null);
                     }
 
                     catalogDAO.set(catalog);
                     awaitDao.delete(await);
                     messageBot.sendMessage("Каталог " + update.getMessage().getText() + " успешно созданн!");
                     Message message = null;
-                    Catalog catalog1 = catalogDAO.get(catalog.getFatherId());
+                    ru.masich.bot.entity.Catalog catalog1 = catalogDAO.get(catalog.getFatherId());
                     if(objId2 == -1L)
-                        message = sendMenu(userBot.getTgId(),Var.catalogGetMasterTitle,Menu.getCatalogMenu(objId,objId2,objId3, storeDao.getStore(catalog.getShopId()).getTitle()));
+                        message = sendMenu(userBot.getTgId(),Var.catalogGetMasterTitle, CatalogMenu.getCatalogMenu(objId,objId2,objId3, storeDao.getStore(catalog.getShopId()).getTitle()));
                     else
-                        message = sendMenu(userBot.getTgId(),Var.catalogGetChildTitle,Menu.getCatalogMenu(objId,objId2,objId3, catalog1.getTitle()));
+                        message = sendMenu(userBot.getTgId(),Var.catalogGetChildTitle, CatalogMenu.getCatalogMenu(objId,objId2,objId3, catalog1.getTitle()));
 
                     LastMessage lastMessage = lastMessageDAO.getLastMessage(userBot.getId());
                     lastMessage.setLastMessageId(message.getMessageId().longValue());
@@ -131,13 +131,13 @@ public class Proxy {
                 case Var.catalogEdit ->
                 {
                     awaitDao.delete(await);
-                    Catalog catalog = catalogDAO.get(objId);
+                    ru.masich.bot.entity.Catalog catalog = catalogDAO.get(objId);
                     catalog.setTitle(update.getMessage().getText());
                     catalogDAO.update(catalog);
 
                     messageBot.sendMessage("Каталог #"+ catalog.getId() + "  переименован на "+catalog.getTitle());
 
-                    Message message = sendMenu(userBot.getTgId(),"Меню каталога: "+catalog.getTitle(), Menu.getCatalogMenu(catalog.getShopId(), -1L, catalog.getId(), "Каталог "+ catalog.getTitle()));
+                    Message message = sendMenu(userBot.getTgId(),"Меню каталога: "+catalog.getTitle(), CatalogMenu.getCatalogMenu(catalog.getShopId(), -1L, catalog.getId(), "Каталог "+ catalog.getTitle()));
 
                     LastMessage lastMessage = lastMessageDAO.getLastMessage(userBot.getId());
                     lastMessage.setLastMessageId(message.getMessageId().longValue());
@@ -156,9 +156,9 @@ public class Proxy {
                     Message message = null;
 
                     if(objId2 == -1L)
-                        message = sendMenu(userBot.getTgId(),Var.catalogGetMasterTitle,Menu.getCatalogMenu(objId,objId2,objId3, storeDao.getStore(objId).getTitle()));
+                        message = sendMenu(userBot.getTgId(),Var.catalogGetMasterTitle, CatalogMenu.getCatalogMenu(objId,objId2,objId3, storeDao.getStore(objId).getTitle()));
                     else
-                        message = sendMenu(userBot.getTgId(),Var.catalogGetChildTitle,Menu.getCatalogMenu(objId,objId2,objId3, catalogDAO.get(objId2).getTitle()));
+                        message = sendMenu(userBot.getTgId(),Var.catalogGetChildTitle, CatalogMenu.getCatalogMenu(objId,objId2,objId3, catalogDAO.get(objId2).getTitle()));
 
 
                     LastMessage lastMessage = lastMessageDAO.getLastMessage(userBot.getId());
@@ -169,7 +169,7 @@ public class Proxy {
                 //Если не найденна команда
                 default -> {
                     messageBot.sendMessage("Отложенная команда: " + mes + " не распознанна!");
-                    messageBot.sendMenu(Menu.getStartMenu(userBot));
+                    messageBot.sendMenu(CatalogMenu.getStartMenu(userBot));
                     awaitDao.delete(await);
                 }
             }

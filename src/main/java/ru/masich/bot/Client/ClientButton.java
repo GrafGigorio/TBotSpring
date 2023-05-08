@@ -28,8 +28,14 @@ public class ClientButton {
         //если префикс обьекта objectId
         if(callbackQuery.getData().contains("objId"))
         {
-            ActionProxy actionProxy = new ActionProxy();
-            actionProxy.proxy(proxyClient);
+            ActionProxy actionProxy = new ActionProxy(proxyClient);
+            actionProxy.proxy();
+        }
+        //если редактирование корзины
+        if(callbackQuery.getData().contains("chartEdit"))
+        {
+            ActionProxy actionProxy = new ActionProxy(proxyClient);
+            actionProxy.proxy();
         }
         //Если нажата кнопка получения каталога
         if(callbackQuery.getData().contains(Var.catalogGet))
@@ -71,5 +77,7 @@ public class ClientButton {
                 }
             }
         }
+
+
     }
 }

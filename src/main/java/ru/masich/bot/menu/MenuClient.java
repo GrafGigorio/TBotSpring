@@ -9,6 +9,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKe
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import ru.masich.bot.Client.ClientButton;
 import ru.masich.bot.Client.ClientMessage;
+import ru.masich.bot.Client.Func.CheckBox;
 import ru.masich.bot.DAO.IMPL.CatalogDAOimpl;
 import ru.masich.bot.DAO.IMPL.ObjectSendDAOimpl;
 import ru.masich.bot.DAO.IMPL.StoreDAOimpl;
@@ -36,7 +37,6 @@ public class MenuClient {
         List<Catalog> catalogs = catalogDAO.getCatalogAllStore(Long.valueOf(shopID));
         sendCatalogs(userBot.getTgId(),catalogs);
     }
-
     public static void sendCatalogs(Long chat_id, List<Catalog> catalogs) throws TelegramApiException {
         for (Catalog catalog : catalogs)
         {
@@ -95,35 +95,30 @@ public class MenuClient {
                     .build());
         }
         //Свойства по размеру
-        List<Map<String, String>> size = (List<Map<String, String>>) params.get("check_box_prop");
+        List<Map<String, Object>> size = (List<Map<String, Object>>) params.get("check_box_prop");
 
         InlineKeyboardMarkup kb = new InlineKeyboardMarkup();
-        List<List<InlineKeyboardButton>> lines = new ArrayList<>();
+       //List<List<InlineKeyboardButton>> lines = new ArrayList<>();
 
-        if(size != null)
-        {
-            List<InlineKeyboardButton> prop = new ArrayList<>();
-            for (Map<String,String> check_box_prop : size) {
-                check_box_prop.put("objId", objectId + "");
-                String val = check_box_prop.get("tit");
-                if (check_box_prop.get("sel") != null) {
-                    val = ">" + val + "<";
-                    check_box_prop = new HashMap<>();
-                }
-                //удаляем название так как ограничение на колбэк 64 байта
-                check_box_prop.remove("tit");
-                prop.add(InlineKeyboardButton.builder()
-                        .text(val)
-                        .callbackData(new JSONObject(check_box_prop).toString())
-                        .build());
-            }
-            lines.add(prop);
-        }
+        List<List<InlineKeyboardButton>> lines = new ArrayList<>(CheckBox.check(params, String.valueOf(objectId)));
+
         lines.add(count);
 
+        StringBuilder title = new StringBuilder();
+        Object sizeTitle = (size).removeIf(x -> {
+            if (x.get("sel") != null)
+                title.append(x.get("tit"));
+            return false;
+        });
+        String cuont = dsd.get(0).get("cou");
+
+        Map<String,String> callbackAddChart = new HashMap<>();
+        callbackAddChart.put("objId", String.valueOf(objectId));
+        callbackAddChart.put("act", "addChart");
+
         InlineKeyboardButton addToChart = InlineKeyboardButton.builder()
-                .text("Добавить в корзину: "+ 1 +" штуку.")
-                .callbackData("objectId:"+objectId+":action:addChart")
+                .text("Добавить в корзину: ("+title +") "+ cuont +" " +params.get("measurement"))
+                .callbackData(new JSONObject(callbackAddChart).toString())
                 .build();
         ///bot.answer_callback_query(call.id, text="Дата выбрана")
 

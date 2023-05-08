@@ -61,7 +61,7 @@ public class CatalogDAOimpl implements CatalogDAO {
         try {
             session = sessionFactory.openSession();
             session.beginTransaction();
-            return session.get(Catalog.class, catalogID);
+            return session.get(Catalog.class, (long) catalogID);
         }
         finally {
             session.close();
