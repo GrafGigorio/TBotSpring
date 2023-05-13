@@ -6,10 +6,8 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import ru.masich.Sheets.Sheets;
 import ru.masich.bot.DAO.IMPL.CatalogDAOimpl;
 import ru.masich.bot.DAO.IMPL.ProductDAOimpl;
-import ru.masich.bot.DAO.IMPL.StoreDAOimpl;
 import ru.masich.bot.DAO.interfaces.CatalogDAO;
 import ru.masich.bot.DAO.interfaces.ProductDAO;
-import ru.masich.bot.DAO.interfaces.StoreDao;
 import ru.masich.bot.action.Button;
 import ru.masich.bot.entity.Catalog;
 import ru.masich.bot.entity.Product;
@@ -21,10 +19,9 @@ import java.util.*;
 
 
 public class Download {
-    private static StoreDao storeDao = new StoreDAOimpl();
-    private static CatalogDAO catalogDAO = new CatalogDAOimpl();
-    private static ProductDAO productDAO = new ProductDAOimpl();
-    private Button butIn;
+    private static final CatalogDAO catalogDAO = new CatalogDAOimpl();
+    private static final ProductDAO productDAO = new ProductDAOimpl();
+    private final Button butIn;
     int shopid;
 
 
@@ -118,19 +115,17 @@ public class Download {
 
         try {
             catalog = Sheets.get(catTable);//Категории!A3:F
-        } catch (GeneralSecurityException e) {
-            throw new RuntimeException(e);
-        } catch (IOException e) {
+        } catch (GeneralSecurityException | IOException e) {
             throw new RuntimeException(e);
         }
 
         List<Catalog> ggTable = convertCatalog(catalog);
-        List<Catalog> db = catalogDAO.getCatalogAllStore(Long.valueOf(shopid));
+        List<Catalog> db = catalogDAO.getCatalogAllStore((long) shopid);
 
-        List<Catalog> catDelete = db.stream().filter(x -> {
+        db.stream().filter(x -> {
             List<Catalog> dqe = ggTable.stream().filter(p ->
                     p.getId() != null && p.getId().equals(x.getId())).toList();
-            if(dqe.size() > 0)
+            if (dqe.size() > 0)
                 return false;
             else {
                 updates.append("Catalog: ");
@@ -139,12 +134,12 @@ public class Download {
                 updates.append("\r\n");
                 return true;
             }
-        }).toList();
+        });
 
         for (Catalog cat : ggTable) {
             if (cat.getId() == null ) {
                 //Создаем новый каталог
-                updates.append("Будет созданн новый каталог: " + cat.toString());
+                updates.append("Будет созданн новый каталог: ").append(cat.toString());
             } else
             {
                 Catalog catDB = catalogDAO.get(cat.getId());
@@ -162,6 +157,10 @@ public class Download {
             updates.append("Текущий список каталога актуален.\r\n");
         }
 
+        return getStringBuilder(updates);
+    }
+
+    private StringBuilder getStringBuilder(StringBuilder updates) {
         try {
             butIn.startBot.execute(SendMessage.builder()
                     .chatId(butIn.update.getCallbackQuery().getFrom().getId())
@@ -176,6 +175,7 @@ public class Download {
         }
         return updates;
     }
+
     public StringBuilder productCheck(String proTable)
     {
         StringBuilder updates = new StringBuilder();
@@ -184,14 +184,12 @@ public class Download {
 
         try {
             products = Sheets.get(proTable);
-        } catch (GeneralSecurityException e) {
-            throw new RuntimeException(e);
-        } catch (IOException e) {
+        } catch (GeneralSecurityException | IOException e) {
             throw new RuntimeException(e);
         }
 
         List<Product> ggTable = convertProduct(products);
-        List<Product> db = productDAO.getStore(Long.valueOf(shopid));
+        List<Product> db = productDAO.getStore((long) shopid);
 
         List<Product> proDelete = db.stream().filter(x -> {
             List<Product> dqe = ggTable.stream().filter(p ->
@@ -210,7 +208,7 @@ public class Download {
         for (Product pro : ggTable) {
             if (pro.getId() == 0) {
                 //Создаем новый каталог
-                updates.append("Будет созданн новый товар:\r\n" + pro);
+                updates.append("Будет созданн новый товар:\r\n").append(pro);
             } else
             {
                 Catalog catDB = catalogDAO.get(pro.getId());
@@ -228,19 +226,7 @@ public class Download {
             updates.append("Текущий список товаров актуален.\r\n");
         }
 
-        try {
-            butIn.startBot.execute(SendMessage.builder()
-                    .chatId(butIn.update.getCallbackQuery().getFrom().getId())
-                    .text(updates.toString())
-                    .build());
-            butIn.startBot.execute(AnswerCallbackQuery.builder()
-                    .callbackQueryId(butIn.update.getCallbackQuery().getId())
-                    //   .text(updates.toString())
-                    .build());
-        } catch (TelegramApiException e) {
-            throw new RuntimeException(e);
-        }
-        return updates;
+        return getStringBuilder(updates);
     }
     public StringBuilder sizeCheck(String sizeTable)
     {
@@ -281,19 +267,7 @@ public class Download {
             updates.append("Текущий список свойств размера актуален.\r\n");
         }
 
-        try {
-            butIn.startBot.execute(SendMessage.builder()
-                    .chatId(butIn.update.getCallbackQuery().getFrom().getId())
-                    .text(updates.toString())
-                    .build());
-            butIn.startBot.execute(AnswerCallbackQuery.builder()
-                    .callbackQueryId(butIn.update.getCallbackQuery().getId())
-                    //   .text(updates.toString())
-                    .build());
-        } catch (TelegramApiException e) {
-            throw new RuntimeException(e);
-        }
-        return updates;
+        return getStringBuilder(updates);
     }
     public StringBuilder countCheck(String sizeTable)
     {
@@ -334,19 +308,7 @@ public class Download {
             updates.append("Текущий список свойств размера актуален.\r\n");
         }
 
-        try {
-            butIn.startBot.execute(SendMessage.builder()
-                    .chatId(butIn.update.getCallbackQuery().getFrom().getId())
-                    .text(updates.toString())
-                    .build());
-            butIn.startBot.execute(AnswerCallbackQuery.builder()
-                    .callbackQueryId(butIn.update.getCallbackQuery().getId())
-                    //   .text(updates.toString())
-                    .build());
-        } catch (TelegramApiException e) {
-            throw new RuntimeException(e);
-        }
-        return updates;
+        return getStringBuilder(updates);
     }
     public void execute(){
         StringBuilder updates = new StringBuilder();
@@ -360,15 +322,13 @@ public class Download {
             product = Sheets.get("Товары!A3:F");
             size = Sheets.get("Размер!A3:F");
             count = Sheets.get("Количество!A3:F");
-        } catch (GeneralSecurityException e) {
-            throw new RuntimeException(e);
-        } catch (IOException e) {
+        } catch (GeneralSecurityException | IOException e) {
             throw new RuntimeException(e);
         }
 
         //Изменяем каталоги
-        updates.append(catalogExecute(convertCatalog(catalog), catalogDAO.getCatalogAllStore(Long.valueOf(shopid))));
-        updates.append(productExecute(convertProduct(product), productDAO.getStore(Long.valueOf(shopid))));
+        updates.append(catalogExecute(convertCatalog(catalog), catalogDAO.getCatalogAllStore((long) shopid)));
+        updates.append(productExecute(convertProduct(product), productDAO.getStore((long) shopid)));
 
         if(updates.length() < 5)
         {
@@ -410,7 +370,7 @@ public class Download {
         for (Catalog cat : table) {
             if (cat.getId() == null) {
                 //Создаем новый каталог
-                update.append("Будет созданн новый каталог: " + cat);
+                update.append("Будет созданн новый каталог: ").append(cat);
                 catalogDAO.set(cat);
             } else
             {
@@ -447,7 +407,7 @@ public class Download {
         for (Product prod : table) {
             if (prod.getId() > 0) {
                 //Создаем новый каталог
-                update.append("Будет созданн новый товар: " + prod);
+                update.append("Будет созданн новый товар: ").append(prod);
                 productDAO.set(prod);
             } else
             {
@@ -537,7 +497,7 @@ public class Download {
                 szAr.setAction(sz.get(2).toString());
             //Устанавзиваем использование размера по умолчанию
             if(!sz.get(3).toString().equals(""))
-                szAr.setDefaultSize(sz.get(3).toString().equals("1")?true:false);
+                szAr.setDefaultSize(sz.get(3).toString().equals("1"));
             //Устанавливаем заголовок размера
             if(!sz.get(4).toString().equals(""))
                 szAr.setTitle(sz.get(4).toString());

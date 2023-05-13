@@ -92,47 +92,46 @@ public class Catalog {
     public StringBuilder check(Catalog o) {
         StringBuilder upd = new StringBuilder();
         if (this == o) return new StringBuilder();
-        Catalog catalog = (Catalog) o;
 
-        if (catalog.fatherId != fatherId) {
+        if (!Objects.equals(o.fatherId, fatherId)) {
             upd.append("Каталог id: ");
             upd.append(id);
             upd.append(" будет изменен родитель \r\n\tс ");
             upd.append(fatherId);
             upd.append("\r\n\tна ");
-            upd.append(catalog.getFatherId());
+            upd.append(o.getFatherId());
         }
-        if (!title.equals(catalog.getTitle())) {
+        if (!title.equals(o.getTitle())) {
             upd.append("Каталог id: ");
             upd.append(id);
             upd.append(" будет изменен заголовок \r\n\tс ");
             upd.append(title);
             upd.append("\r\n\tна ");
-            upd.append(catalog.getTitle());
+            upd.append(o.getTitle());
         }
-        if (!catalog.getShopId().equals(shopId)) {
+        if (!o.getShopId().equals(shopId)) {
             upd.append("Каталог id: ");
             upd.append(id);
             upd.append(" будет изменен id магазина \r\n\tс ");
             upd.append(shopId);
             upd.append("\r\n\tна ");
-            upd.append(catalog.getShopId());
+            upd.append(o.getShopId());
         }
-        if (!catalog.getLevel().equals(level)) {
+        if (!o.getLevel().equals(level)) {
             upd.append("Каталог id: ");
             upd.append(id);
             upd.append(" будет изменен уровень вроженности \r\n\tс ");
             upd.append(level);
             upd.append(" \r\n\tна ");
-            upd.append(catalog.getLevel());
+            upd.append(o.getLevel());
         }
-        if (!catalog.getCatalog_atributes().get("photo").equals(catalog_atributes.get("photo"))) {
+        if (!o.getCatalog_atributes().get("photo").equals(catalog_atributes.get("photo"))) {
             upd.append("Каталог id: ");
             upd.append(id);
             upd.append(" будет изменено фото \r\n\tс ");
             upd.append(catalog_atributes.get("photo"));
             upd.append("\r\n\tна ");
-            upd.append(catalog.getCatalog_atributes().get("photo"));
+            upd.append(o.getCatalog_atributes().get("photo"));
         }
         return upd;
     }
