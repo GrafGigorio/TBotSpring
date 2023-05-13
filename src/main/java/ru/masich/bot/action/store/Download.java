@@ -13,6 +13,7 @@ import ru.masich.bot.DAO.interfaces.StoreDao;
 import ru.masich.bot.action.Button;
 import ru.masich.bot.entity.Catalog;
 import ru.masich.bot.entity.Product;
+import ru.masich.bot.entity.ProductSize;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
@@ -39,6 +40,8 @@ public class Download {
 
         updates.append(catalogCheck("Категории!A3:F"));
         updates.append(productCheck("Товары!A3:F"));
+        updates.append(sizeCheck("Размер!A3:F"));
+
 
 //        List<List<Object>> catalog;
 //        List<List<Object>> product;
@@ -245,49 +248,90 @@ public class Download {
         List<List<Object>> size;
 
         try {
+            //Получаем размеры из таблици
             size = Sheets.get(sizeTable);
-        } catch (GeneralSecurityException e) {
-            throw new RuntimeException(e);
-        } catch (IOException e) {
+        } catch (GeneralSecurityException | IOException e) {
             throw new RuntimeException(e);
         }
 
-        List<Product> ggTable = convertProduct(products);
-        List<Product> db = productDAO.getStore(Long.valueOf(shopid));
-
-        List<Product> proDelete = db.stream().filter(x -> {
-            List<Product> dqe = ggTable.stream().filter(p ->
-                    p.getId() > 0 && p.getId() == x.getId()).toList();
-            if(dqe.size() > 0)
-                return false;
-            else {
-                updates.append("Product: ");
-                updates.append(x.getId());
-                updates.append(" будет удаленн! \uD83D\uDDD1 ");
+        //Конвертируем размеры из таблици в обьекты
+        List<ProductSize> ggTable = convertSize(size);
+        //Буферный размер, для сокращения числа обращений к бд
+        Product buffPS = null;
+        //Проходимся по всем размерам
+        for(ProductSize ps: ggTable)
+        {
+            //Если буфер пустой или id отличется от проверяемого
+            if(buffPS == null || ps.getProductId() != buffPS.getId())
+                buffPS = productDAO.get(ps.getProductId());
+            //Получаем обьект размера продукта
+            ProductSize psProduct = buffPS.getPtoductSize(ps.getNumber());
+            if(!ps.equals(psProduct)) {
+                updates.append("Свойство размера продукта: '");
+                updates.append(buffPS.getProductAttributes().get("title"));
+                updates.append("' -> '");
+                updates.append(psProduct.getTitle());
+                updates.append("' будет измененно.");
                 updates.append("\r\n");
-                return true;
-            }
-        }).toList();
-
-        for (Product pro : ggTable) {
-            if (pro.getId() == 0) {
-                //Создаем новый каталог
-                updates.append("Будет созданн новый товар:\r\n" + pro);
-            } else
-            {
-                Catalog catDB = catalogDAO.get(pro.getId());
-                //=============
-                String upd = pro.check(pro).toString();
-                if(!upd.equals("")) {
-                    updates.append(upd);
-                    updates.append("\r\n");
-                }
             }
         }
 
         if(updates.length() < 5)
         {
-            updates.append("Текущий список товаров актуален.\r\n");
+            updates.append("Текущий список свойств размера актуален.\r\n");
+        }
+
+        try {
+            butIn.startBot.execute(SendMessage.builder()
+                    .chatId(butIn.update.getCallbackQuery().getFrom().getId())
+                    .text(updates.toString())
+                    .build());
+            butIn.startBot.execute(AnswerCallbackQuery.builder()
+                    .callbackQueryId(butIn.update.getCallbackQuery().getId())
+                    //   .text(updates.toString())
+                    .build());
+        } catch (TelegramApiException e) {
+            throw new RuntimeException(e);
+        }
+        return updates;
+    }
+    public StringBuilder countCheck(String sizeTable)
+    {
+        StringBuilder updates = new StringBuilder();
+        List<List<Object>> count;
+
+        try {
+            //Получаем обьект количества из таблици
+            count = Sheets.get(sizeTable);
+        } catch (GeneralSecurityException | IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        //Конвертируем размеры из таблици в обьекты
+        List<ProductSize> ggTable = convertSize(count);
+        //Буферный размер, для сокращения числа обращений к бд
+        Product buffPS = null;
+        //Проходимся по всем размерам
+        for(ProductSize ps: ggTable)
+        {
+            //Если буфер пустой или id отличется от проверяемого
+            if(buffPS == null || ps.getProductId() != buffPS.getId())
+                buffPS = productDAO.get(ps.getProductId());
+            //Получаем обьект размера продукта
+            ProductSize psProduct = buffPS.getPtoductSize(ps.getNumber());
+            if(!ps.equals(psProduct)) {
+                updates.append("Свойство размера продукта: '");
+                updates.append(buffPS.getProductAttributes().get("title"));
+                updates.append("' -> '");
+                updates.append(psProduct.getTitle());
+                updates.append("' будет измененно.");
+                updates.append("\r\n");
+            }
+        }
+
+        if(updates.length() < 5)
+        {
+            updates.append("Текущий список свойств размера актуален.\r\n");
         }
 
         try {
@@ -474,7 +518,34 @@ public class Download {
         return prodOut;
     }
 
+    private List<ProductSize> convertSize(List<List<Object>> size)
+    {
+        List<ProductSize> sizeOut = new ArrayList<>();
+        for (List<Object> sz : size)
+        {
+            ProductSize szAr = new ProductSize();
+            Map<String, Object> params  = new IdentityHashMap<>();
 
+            //Устанавливаем id товара
+            if(!sz.get(0).toString().equals(""))
+                szAr.setProductId(Integer.parseInt(sz.get(0).toString()));
+            //Устанавливаем уникальный для товара id размера
+            if(!sz.get(1).toString().equals(""))
+                szAr.setNumber(Integer.parseInt(sz.get(1).toString()));
+            //Устанавливаем тип действия
+            if(!sz.get(2).toString().equals(""))
+                szAr.setAction(sz.get(2).toString());
+            //Устанавзиваем использование размера по умолчанию
+            if(!sz.get(3).toString().equals(""))
+                szAr.setDefaultSize(sz.get(3).toString().equals("1")?true:false);
+            //Устанавливаем заголовок размера
+            if(!sz.get(4).toString().equals(""))
+                szAr.setTitle(sz.get(4).toString());
+
+            sizeOut.add(szAr);
+        }
+        return sizeOut;
+    }
     private StringBuilder checkCatalog(Catalog catDB, Catalog catTable)//✅
     {
         StringBuilder updates = new StringBuilder();

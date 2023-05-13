@@ -1,6 +1,7 @@
 package ru.masich.bot.entity;
 
 import javax.persistence.*;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -67,6 +68,14 @@ public class Product {
         this.productAttributes = customerAttributes;
     }
 
+    public ProductSize getPtoductSize(int psID)
+    {
+        List<Map<String, Object>> ps = (List<Map<String, Object>>) productAttributes.get("check_box_prop");
+        Map<String, Object> retp = ps.stream().filter(x -> {
+            return (int)x.get("id") == psID;
+        }).findFirst().get();
+        return new ProductSize(id,(int)retp.get("id"),retp.get("act").toString(),retp.get("sel")==null?false:true,retp.get("tit").toString());
+    }
     public StringBuilder check(Product o) {
         StringBuilder upd = new StringBuilder();
         if (this == o) return new StringBuilder();

@@ -149,4 +149,5 @@ public class Catalog {
     public int hashCode() {
         return Objects.hash(id, fatherId, title, shopId, level, catalog_atributes);
     }
+
 }
