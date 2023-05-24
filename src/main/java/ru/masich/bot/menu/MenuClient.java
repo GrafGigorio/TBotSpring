@@ -82,20 +82,23 @@ public class MenuClient {
 
         List<InlineKeyboardButton> count = new ArrayList<>();
 
-        List<Map<String,String>> dsd = (List<Map<String, String>>) params.get("count_property");
+        Map<String, Map<String,String>> dsd = (Map<String, Map<String, String>>) params.get("count_property");
         //Свойства по количеству
-        for (Map<String,String> countProp : dsd)
+        for (Map.Entry<String, Map<String,String>>  countProp : dsd.entrySet())
         {
-            countProp.put("objId",objectId+"");
-            String title = countProp.get("tit");
-            countProp.remove("tit");
+            Map<String,String> dasdwd= countProp.getValue();
+            dasdwd.put("objId",objectId+"");
+            String title = dasdwd.get("tit");
+            dasdwd.remove("tit");
+            String dasd = new JSONObject(dasdwd).toString();
             count.add(InlineKeyboardButton.builder()
                     .text(title)
-                    .callbackData(new JSONObject(countProp).toString())
+                    .callbackData(dasd)
                     .build());
+            System.out.println(count);
         }
         //Свойства по размеру
-        List<Map<String, Object>> size = (List<Map<String, Object>>) params.get("check_box_prop");
+        Map<String, Map<String, Object>> size = (Map<String, Map<String, Object>>) params.get("check_box_prop");
 
         InlineKeyboardMarkup kb = new InlineKeyboardMarkup();
        //List<List<InlineKeyboardButton>> lines = new ArrayList<>();
@@ -105,12 +108,18 @@ public class MenuClient {
         lines.add(count);
 
         StringBuilder title = new StringBuilder();
-        Object sizeTitle = (size).removeIf(x -> {
+//        Object sizeTitle = (size) .removeIf(x -> {
+//            if (x.get("sel") != null)
+//                title.append(x.get("tit"));
+//            return false;
+//        });
+        for (Map.Entry<String, Map<String, Object>> szdd : size.entrySet())
+        {
+            Map<String, Object> x = szdd.getValue();
             if (x.get("sel") != null)
                 title.append(x.get("tit"));
-            return false;
-        });
-        String cuont = dsd.get(0).get("cou");
+        }
+        Object cuont = dsd.get("1").get("cou");
 
         Map<String,String> callbackAddChart = new HashMap<>();
         callbackAddChart.put("objId", String.valueOf(objectId));

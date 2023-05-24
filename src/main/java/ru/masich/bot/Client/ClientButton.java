@@ -25,6 +25,7 @@ public class ClientButton {
         ClientButton.proxyClient = proxyClient;
         CallbackQuery callbackQuery = proxyClient.startBotUser.update.getCallbackQuery();
 
+        String  sd = callbackQuery.getData();
         //если префикс обьекта objectId
         if(callbackQuery.getData().contains("objId"))
         {

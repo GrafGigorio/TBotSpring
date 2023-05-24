@@ -157,7 +157,7 @@ public class Button {
             case "store:download:" -> {
                 Download download = new Download(this, Integer.parseInt(comandSeq[2]));
                 download.execute();
-                //Обновляем таблицу после изменений
+                //Обновляем таблицу после изменений нужно для формирования очередности списков
                 Upload upload = new Upload(this, Integer.parseInt(comandSeq[2]));
                 upload.execute();
             }

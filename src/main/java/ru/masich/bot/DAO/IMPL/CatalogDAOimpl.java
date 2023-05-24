@@ -5,6 +5,7 @@ import ru.masich.bot.Var;
 import ru.masich.bot.entity.Catalog;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import ru.masich.bot.entity.Product;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -99,11 +100,14 @@ public class CatalogDAOimpl implements CatalogDAO {
     }
 
     @Override
-    public void delete(Catalog section) {
+    public void delete(Catalog catalog) {
         try {
             session = sessionFactory.openSession();
             session.beginTransaction();
-            session.delete(section);
+            List<Product> dropProducts = session.createQuery("from Product where catalogId="+catalog.getId(), Product.class).getResultList();
+            for (Product product : dropProducts)
+                session.delete(product);
+            session.delete(catalog);
             session.getTransaction().commit();
         }
         finally {

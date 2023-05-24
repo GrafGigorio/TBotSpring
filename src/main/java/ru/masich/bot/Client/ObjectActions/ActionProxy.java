@@ -47,13 +47,15 @@ public class ActionProxy {
             int productId = (int) objectSend.getProperty().get("productId");
             Product product = productDAO.get(productId);
             Map<String, Object> productAttributes = product.getProductAttributes();
-            List<Map<String, Object>> check_box_prop = (List<Map<String, Object>>) productAttributes.get("check_box_prop");
+            Map<String, Map<String, Object>> check_box_prop = (Map<String, Map<String, Object>>) productAttributes.get("check_box_prop");
 
-            for (Map<String, Object> checkbox : check_box_prop) {
-                if (checkbox.get("id").equals(jsonObject.get("id"))) {
-                    checkbox.put("sel", "1");
-                } else if (checkbox.containsKey("sel"))
-                    checkbox.remove("sel");
+            for (Map.Entry<String, Map<String, Object>> checkbox : check_box_prop.entrySet()) {
+                Map<String, Object> asdawdawdasd = checkbox.getValue();
+
+                if (checkbox.getKey().equals(jsonObject.get("id"))) {
+                    asdawdawdasd.put("sel", "1");
+                } else if (asdawdawdasd.containsKey("sel"))
+                    asdawdawdasd.remove("sel");
             }
             objectSend.getProperty().put("check_box_prop", check_box_prop);
 
@@ -128,16 +130,19 @@ public class ActionProxy {
         InlineKeyboardMarkup kb = new InlineKeyboardMarkup();
             List<InlineKeyboardButton> count = new ArrayList<>();
 
-            List<Map<String, String>> dsd = (List<Map<String, String>>) productAttributes.get("count_property");
+            Map<String, Map<String, String>> dsd = (Map<String, Map<String, String>>) productAttributes.get("count_property");
             //Свойства по количеству
-            for (Map<String, String> countProp : dsd) {
+            for (Map.Entry<String, Map<String, String>> countProp : dsd.entrySet()) {
+                Map<String, String> asd = countProp.getValue();
 
-                countProp.put("objId", objectId + "");
-                String title = countProp.get("tit");
-                countProp.remove("tit");
+                asd.put("objId", objectId + "");
+                asd.put("id", countProp.getKey());
+                String title = asd.get("tit");
+                asd.remove("tit");
+                String dsdaa = new JSONObject(asd).toString();
                 count.add(InlineKeyboardButton.builder()
                         .text(title)
-                        .callbackData(new JSONObject(countProp).toString())
+                        .callbackData(dsdaa)
                         .build());
             }
 
@@ -153,24 +158,20 @@ public class ActionProxy {
 
         StringBuilder title = new StringBuilder();
         //Добавить в кор зину
-        List<Map<String, Object>> checkBox =(List<Map<String, Object>>) objectSendProperty.get("check_box_prop");
-        if(checkBox != null) {
-            Object sizeTitle = (checkBox).removeIf(x -> {
-                if (x.get("sel") != null)
-                    title.append(x.get("tit"));
-                return false;
-            });
-        }
-        else {
-            checkBox =(List<Map<String, Object>>) productAttributes.get("check_box_prop");
-            Object sizeTitle = (checkBox).removeIf(x -> {
-                if (x.get("sel") != null)
-                    title.append(x.get("tit"));
-                return false;
-            });
+        Map<String ,Map<String, Object>> checkBox = (Map<String, Map<String, Object>>) objectSendProperty.get("check_box_prop");
+
+        for(Map.Entry<String ,Map<String, Object>> xds : checkBox.entrySet())
+        {
+            Map<String, Object> x = xds.getValue();
+            if (x.get("sel") != null)
+                title.append(x.get("tit"));
         }
 
-        String cuont = objectSendProperty.get("count") == null ? dsd.get(0).get("cou") : objectSendProperty.get("count").toString();
+
+
+        Object cuont = objectSendProperty.get("count") == null ?
+                dsd.get("1").get("cou") :
+                objectSendProperty.get("count").toString();
 
         Map<String,String> callbackAddChart = new HashMap<>();
         callbackAddChart.put("objId", String.valueOf(objectId));
