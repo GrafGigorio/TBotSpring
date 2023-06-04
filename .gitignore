@@ -35,3 +35,4 @@ build/
 ### secret Files ###
 /src/main/resources/
 !**/src/main/resources/
+!**/src/main/tokens/
