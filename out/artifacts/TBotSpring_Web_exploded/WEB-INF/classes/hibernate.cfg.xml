@@ -21,6 +21,7 @@
         <mapping class="ru.masich.bot.entity.UserBot"/>
         <mapping class="ru.masich.bot.entity.ObjectSend"/>
         <mapping class="ru.masich.bot.entity.Chart"/>
+        <mapping class="ru.masich.bot.entity.BIgObject"/>
 
     </session-factory>
 </hibernate-configuration>

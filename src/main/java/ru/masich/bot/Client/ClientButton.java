@@ -25,26 +25,30 @@ public class ClientButton {
     public static ProxyClient proxyClient;
     static Logger logger = LoggerFactory.getLogger(ClientButton.class);
     public static void execute(ProxyClient proxyClient) throws TelegramApiException {
-        logger.info("<<  execute");
+
         ClientButton.proxyClient = proxyClient;
         CallbackQuery callbackQuery = proxyClient.startBotUser.update.getCallbackQuery();
+        logger.info("<< execute " + callbackQuery.getData());
 
         String  sd = callbackQuery.getData();
         //если префикс обьекта objectId
         if(callbackQuery.getData().contains("objId"))
         {
+            logger.info("<< execute objId ");
             ActionProxy actionProxy = new ActionProxy(proxyClient);
             actionProxy.proxy();
         }
         //если редактирование корзины
         if(callbackQuery.getData().contains("chartEdit"))
         {
+            logger.info("<< execute chartEdit");
             ActionProxy actionProxy = new ActionProxy(proxyClient);
             actionProxy.proxy();
         }
         //Если нажата кнопка получения каталога
         if(callbackQuery.getData().contains(Var.catalogGet))
         {
+            logger.info("<< execute chartEdit " + Var.catalogGet);
             String[] arr = callbackQuery.getData().split(":");
             CatalogDAO catalogDAO = new CatalogDAOimpl();
             ProductDAO productDAO = new ProductDAOimpl();

@@ -35,9 +35,10 @@ public class ActionProxy {
     }
     public void proxy()
     {
-        logger.info("<< proxy");
+
         CallbackQuery callbackQuery = proxyClient.startBotUser.update.getCallbackQuery();
 
+        logger.info("<< proxy " + callbackQuery.getData());
         System.out.println(">>>> ");
         System.out.println(callbackQuery.getData());
         System.out.println(">>>> ");
@@ -48,6 +49,7 @@ public class ActionProxy {
         int messageId = objectSend.getObjectId();
 
         if(jsonObject.get("act").equals("sbx")) {
+            logger.info("<< proxy act sbx");
             int productId = (int) objectSend.getProperty().get("productId");
             Product product = productDAO.get(productId);
             Map<String, Object> productAttributes = product.getProductAttributes();
@@ -68,6 +70,7 @@ public class ActionProxy {
             return;
         }
         if(jsonObject.get("act").equals("p")) {
+            logger.info("<< proxy act p");
             int productId = (int) objectSend.getProperty().get("productId");
             Product product = productDAO.get(productId);
             Map<String, Object> objectSendProp = objectSend.getProperty();
@@ -83,6 +86,7 @@ public class ActionProxy {
             return;
         }
         if(jsonObject.get("act").equals("m")) {
+            logger.info("<< proxy act m");
             int productId = (int) objectSend.getProperty().get("productId");
             Product product = productDAO.get(productId);
             Map<String, Object> objectSendProp = objectSend.getProperty();
@@ -99,6 +103,7 @@ public class ActionProxy {
         }
         //Добавление в корзину
         if(jsonObject.get("act").equals("addChart")) {
+            logger.info("<< proxy act addChart");
             int productId = (int) objectSend.getProperty().get("productId");
             Product product = productDAO.get(productId);
             ChartFunc.add(proxyClient.startBotUser, objectSend, product);
@@ -106,11 +111,13 @@ public class ActionProxy {
         }
         //Редактируем корзину
         if(jsonObject.get("act").equals("chartEdit")) {
+            logger.info("<< proxy act chartEdit");
             ChartFunc.edit(proxyClient.startBotUser, objectSend);
             return;
         }
         //Оформляем заказ
         if(jsonObject.get("act").equals("chartCommit")) {
+            logger.info("<< proxy act chartCommit");
             return;
         }
 

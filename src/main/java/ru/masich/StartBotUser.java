@@ -29,7 +29,8 @@ public class StartBotUser extends TelegramLongPollingBot {
 
     @Override
     public void onUpdateReceived(Update update) {
-        logger.info("<<  onUpdateReceived");
+        System.out.println("+======++======++======++======++======++======++======++======++======++======++======++======++======++======++======++======++======++======++======++======++======+");
+        logger.info("<< onUpdateReceived");
         this.update = update;
         ProxyClient proxy = new ProxyClient(this);
 
