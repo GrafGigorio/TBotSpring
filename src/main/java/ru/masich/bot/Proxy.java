@@ -1,5 +1,7 @@
 package ru.masich.bot;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -32,9 +34,11 @@ public class Proxy {
     public Proxy(StartBot startBot) {
         this.startBot = startBot;
     }
+    static Logger logger = LogManager.getLogger(Proxy.class);
 
     public void proxy(Update update)
     {
+        logger.info("<<");
         this.update = update;
         getFrom(update);//Сохраняем поле пользователя userBot и проверяем наличие обновлений полей
 
@@ -189,6 +193,7 @@ public class Proxy {
 
     private void getFrom(Update update)
     {
+        logger.info("<<");
         UserBot userBotTh = null;
         User user = null;
 
@@ -216,6 +221,7 @@ public class Proxy {
     }
 
     public Message sendMenu(Long who, String txt, InlineKeyboardMarkup kb) {
+        logger.info("<<");
         SendMessage sm = SendMessage.builder().chatId(who.toString())
                 .parseMode("HTML").text(txt)
                 .replyMarkup(kb).build();

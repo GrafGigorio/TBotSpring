@@ -1,5 +1,7 @@
 package ru.masich;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
@@ -11,7 +13,7 @@ import java.util.List;
 
 @Component
 public class StartBotUser extends TelegramLongPollingBot {
-
+    Logger logger = LoggerFactory.getLogger(StartBotUser.class);
 
     public Update update;
     @Value("${bot.client.username}")
@@ -27,6 +29,7 @@ public class StartBotUser extends TelegramLongPollingBot {
 
     @Override
     public void onUpdateReceived(Update update) {
+        logger.info("<<  onUpdateReceived");
         this.update = update;
         ProxyClient proxy = new ProxyClient(this);
 

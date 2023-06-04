@@ -1,5 +1,7 @@
 package ru.masich.bot.menu;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
@@ -21,8 +23,10 @@ public class CatalogMenu {
     private static List<List<InlineKeyboardButton>> storeLines = new ArrayList<>();
     private static CatalogDAO catalogDAO = new CatalogDAOimpl();
     private static StoreDao storeDao = new StoreDAOimpl();
+    static Logger logger = LogManager.getLogger(CatalogMenu.class);
     public static SendMessage getStartMenu(UserBot userBot)
     {
+        logger.info("<< getStartMenu");
         var newStore = InlineKeyboardButton.builder()
                 .text("Добавить новый магазин").callbackData(Var.createStore)
                 .build();
@@ -41,6 +45,7 @@ public class CatalogMenu {
     }
     public static InlineKeyboardMarkup getStartMenu(Long userBot)
     {
+        logger.info("<< getStartMenu");
         storeLines = new ArrayList<>();
         List<InlineKeyboardButton> lines = new ArrayList<>();
 
@@ -59,7 +64,7 @@ public class CatalogMenu {
                 .build();
     }
     public static InlineKeyboardMarkup getStoresList(UserBot userBot) {
-
+        logger.info("<< getStoresList");
         List<Store> stores = storeDao.getAllUserStores(userBot.getId());
         storeLines = new ArrayList<>();
         for (Store store : stores) {
@@ -79,7 +84,7 @@ public class CatalogMenu {
                 .build();
     }
     public static InlineKeyboardMarkup getStoresList(Long userBotId) {
-
+        logger.info("<< getStoresList");
         List<Store> stores = storeDao.getAllUserStores(userBotId);
         storeLines = new ArrayList<>();
         for (Store store : stores) {
@@ -101,6 +106,7 @@ public class CatalogMenu {
 
     public static InlineKeyboardMarkup getStoreMenu(Store store,Long parant, Long catalog)
     {
+        logger.info("<< getStoreMenu");
         storeLines = new ArrayList<>();
         storeLines.add(List.of(
                 InlineKeyboardButton
@@ -175,6 +181,7 @@ public class CatalogMenu {
 
     public static InlineKeyboardMarkup getCatalogMenu(Long shopId, Long parentId, Long catalogId,String title)
     {
+        logger.info("<<  getCatalogMenu");
         //Если указан catalogId то это каталог нижнего уровня в котором должны быть только товары
         //Если указан parentId то это родительский каталог других каталогов
         //Если указан только shopId то это список каталога верхнего уровня

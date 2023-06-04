@@ -1,5 +1,7 @@
 package ru.masich.bot.Client;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.telegram.telegrambots.meta.api.methods.commands.SetMyCommands;
 import org.telegram.telegrambots.meta.api.methods.invoices.CreateInvoiceLink;
 import org.telegram.telegrambots.meta.api.methods.invoices.SendInvoice;
@@ -19,11 +21,14 @@ import java.util.List;
 
 public class ClientMessage {
     public static ProxyClient proxyClient;
+    static Logger logger = LogManager.getLogger(ClientMessage.class);
     public static void execute(ProxyClient proxyClient) throws TelegramApiException {
+
         ClientMessage.proxyClient = proxyClient;
         String mes = proxyClient.startBotUser.update.getMessage().getText();
         String retMes="123";
 
+        logger.info("<< execute mes " + mes);
         if(mes == null)
         {
             System.out.println("=============");
@@ -47,11 +52,11 @@ public class ClientMessage {
     }
     static public Message sendMessage(String mes)
     {
-
-List<BotCommand> commands = new ArrayList<>();
-commands.add(new BotCommand("start", "Начало"));
-commands.add(new BotCommand("catalog", "Каталог"));
-commands.add(new BotCommand("chart", "Корзина"));
+        logger.info("<<  sendMessage");
+        List<BotCommand> commands = new ArrayList<>();
+        commands.add(new BotCommand("start", "Начало"));
+        commands.add(new BotCommand("catalog", "Каталог"));
+        commands.add(new BotCommand("chart", "Корзина"));
 
         LabeledPrice labeledPrice = new LabeledPrice();
         labeledPrice.setLabel("Товар1");

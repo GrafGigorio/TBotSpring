@@ -2,6 +2,8 @@ package ru.masich.bot.DAO.IMPL;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.masich.bot.DAO.interfaces.ChartDAO;
 import ru.masich.bot.Var;
 import ru.masich.bot.entity.Chart;
@@ -11,7 +13,7 @@ import java.util.List;
 public class ChartDAOimpl implements ChartDAO {
     SessionFactory sessionFactory;
     Session session;
-
+    static Logger logger = LoggerFactory.getLogger(ChartDAOimpl.class);
     public ChartDAOimpl() {
         this.sessionFactory = Var.sessionFactory;
         this.session = sessionFactory.getCurrentSession();
@@ -19,6 +21,7 @@ public class ChartDAOimpl implements ChartDAO {
 
     @Override
     public Chart getActiveChart(Long userId) {
+        logger.info("<< getActiveChart userId " + userId);
         try{
             session = sessionFactory.openSession();
             session.beginTransaction();
@@ -37,6 +40,7 @@ public class ChartDAOimpl implements ChartDAO {
 
     @Override
     public Chart get(int chartId) {
+        logger.info("<< get chartId "+ chartId);
         try{
             session = sessionFactory.openSession();
             session.beginTransaction();
@@ -49,6 +53,7 @@ public class ChartDAOimpl implements ChartDAO {
 
     @Override
     public List<Chart> getClosedChartList(int userId) {
+        logger.info("<< getClosedChartList userId "+userId);
         try{
             session = sessionFactory.openSession();
             session.beginTransaction();
@@ -67,6 +72,7 @@ public class ChartDAOimpl implements ChartDAO {
 
     @Override
     public Chart updateOrAdd(Chart chart) {
+        logger.info("<< updateOrAdd chart "+chart);
         try{
             session = sessionFactory.openSession();
             session.beginTransaction();

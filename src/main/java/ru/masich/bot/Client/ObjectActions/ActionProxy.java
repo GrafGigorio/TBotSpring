@@ -1,5 +1,7 @@
 package ru.masich.bot.Client.ObjectActions;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.json.JSONObject;
 import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageReplyMarkup;
@@ -26,12 +28,14 @@ public class ActionProxy {
     ObjectSendDAO objectSendDAO = new ObjectSendDAOimpl();
     ProductDAO productDAO = new ProductDAOimpl();
     ProxyClient proxyClient;
+    static Logger logger = LogManager.getLogger(ActionProxy.class);
     public ActionProxy(ProxyClient proxyClient)
     {
         this.proxyClient = proxyClient;
     }
     public void proxy()
     {
+        logger.info("<< proxy");
         CallbackQuery callbackQuery = proxyClient.startBotUser.update.getCallbackQuery();
 
         System.out.println(">>>> ");
@@ -114,13 +118,14 @@ public class ActionProxy {
     }
     private void setProperty(ObjectSend objectSend, Product product)
     {
+        logger.info("<< setProperty");
         Map<String, Object> productAttributes = product.getProductAttributes();
         Map<String, Object> objectSendProp = objectSend.getProperty();
 
         productAttributes.put("check_box_prop",objectSendProp.get("check_box_prop"));
     }
     private void editMessageProductObj(Product product, ObjectSend objectSend) {
-
+        logger.info("<< editMessageProductObj");
         Map<String, Object> productAttributes = product.getProductAttributes();
         Map<String, Object> objectSendProperty = objectSend.getProperty();
         int objectId = Math.toIntExact(objectSend.getId());

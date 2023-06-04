@@ -1,5 +1,7 @@
 package ru.masich.bot.action;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageReplyMarkup;
@@ -14,7 +16,10 @@ import ru.masich.bot.DAO.interfaces.*;
 import ru.masich.bot.Var;
 import ru.masich.bot.action.store.Download;
 import ru.masich.bot.action.store.Upload;
-import ru.masich.bot.entity.*;
+import ru.masich.bot.entity.Await;
+import ru.masich.bot.entity.LastMessage;
+import ru.masich.bot.entity.Store;
+import ru.masich.bot.entity.UserBot;
 import ru.masich.bot.menu.CatalogMenu;
 
 public class Button {
@@ -25,13 +30,16 @@ public class Button {
     StoreDao storeDao = new StoreDAOimpl();
     public Update update;
 
+    Logger logger = LoggerFactory.getLogger(Button.class);
     public Button(StartBot startBot, Update update) {
+        logger.info("<<");
         this.startBot = startBot;
         this.update = update;
     }
 
     public void execute(Update update)
     {
+        logger.info("<<");
         UserBot userBot = userBotDAO.getUserBot(update.getCallbackQuery().getFrom());
         CatalogDAO catalogDAO = new CatalogDAOimpl();
 
@@ -181,7 +189,7 @@ public class Button {
     }
 
     private void editMessage(Long chatId, String queryId, String data, int msgId) {
-
+        logger.info("<<");
         EditMessageText newTxt = EditMessageText.builder()
                 .chatId(chatId.toString())
                 .messageId(msgId).text(data).build();
@@ -202,6 +210,7 @@ public class Button {
     }
     private void editMessage(Long chatId, String queryId, String title, int msgId, InlineKeyboardMarkup menu) {
         //--msgId;
+        logger.info("<<");
         EditMessageText newTxt = EditMessageText.builder()
                 .chatId(chatId.toString())
                 .messageId(msgId).text(title).build();
@@ -222,6 +231,7 @@ public class Button {
         }
     }
     public Message sendMenu(Long who, String txt, InlineKeyboardMarkup kb) {
+        logger.info("<<");
         SendMessage sm = SendMessage.builder().chatId(who.toString())
                 .parseMode("HTML").text(txt)
                 .replyMarkup(kb).build();

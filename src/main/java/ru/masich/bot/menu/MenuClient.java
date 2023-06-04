@@ -1,5 +1,7 @@
 package ru.masich.bot.menu;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.json.JSONObject;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
@@ -22,14 +24,19 @@ import ru.masich.bot.entity.ObjectSend;
 import ru.masich.bot.entity.Product;
 import ru.masich.bot.entity.UserBot;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class MenuClient {
     private static List<List<InlineKeyboardButton>> storeLines = new ArrayList<>();
     private static CatalogDAO catalogDAO = new CatalogDAOimpl();
     private static StoreDao storeDao = new StoreDAOimpl();
+    static Logger logger = LogManager.getLogger(MenuClient.class);
 
     public static void sendStartMenu(UserBot userBot,String title, int shopID) throws TelegramApiException {
+        logger.info("<<  sendStartMenu");
         //Приветствие
         ClientMessage.proxyClient.startBotUser.execute(
                 SendMessage.builder().chatId(userBot.getTgId()).text(title).build());
@@ -38,6 +45,7 @@ public class MenuClient {
         sendCatalogs(userBot.getTgId(),catalogs);
     }
     public static void sendCatalogs(Long chat_id, List<Catalog> catalogs) throws TelegramApiException {
+        logger.info("<<  sendCatalogs");
         for (Catalog catalog : catalogs)
         {
             Map<String, Object> params = catalog.getCatalog_atributes();
@@ -62,7 +70,8 @@ public class MenuClient {
             ClientMessage.proxyClient.startBotUser.execute(sendPhoto);
         }
     }
-    public static void sendProducts(Long chat_id, List<Product> products) throws TelegramApiException {
+    public static void sendProducts(Long chat_id, List<Product> products) {
+        logger.info("<<  sendProducts");
         for (Product product : products)
         {
             //Создалем и сохраняем объект в базе для дальнейшей ссылки на него
@@ -78,6 +87,7 @@ public class MenuClient {
     }
     public static int sendProduct(Product product, Long chat_id, Long objectId)
     {
+        logger.info("<<  sendProduct");
         Map<String, Object> params = product.getProductAttributes();
 
         List<InlineKeyboardButton> count = new ArrayList<>();

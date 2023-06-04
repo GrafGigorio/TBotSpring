@@ -1,5 +1,7 @@
 package ru.masich.bot.Client.Func;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageReplyMarkup;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
@@ -21,8 +23,10 @@ import java.util.List;
 import java.util.Map;
 
 public class ChartFunc {
+    static Logger logger = LoggerFactory.getLogger(ChartFunc.class);
     public static void add(StartBotUser startBotUser, ObjectSend objectSend, Product product)
     {
+        logger.info("<< add");
         ChartDAO chartDAO = new ChartDAOimpl();
 
         Map<String, Object> productAttributes = product.getProductAttributes();
@@ -43,22 +47,20 @@ public class ChartFunc {
             productList = (List<Map<String, Object>>) chartObjectParams.get("products");
         }
 
-        StringBuilder selProductID = new StringBuilder();
-        List<Map<String, Object>> checkBox = (List<Map<String, Object>>) objectSendProp.get("check_box_prop");
-        if (checkBox != null) {
-            Object sizeTitle = (checkBox).removeIf(x -> {
-                if (x.get("sel") != null)
-                    selProductID.append(x.get("id"));
-                return false;
-            });
-        } else {
-            checkBox = (List<Map<String, Object>>) product.getProductAttributes().get("check_box_prop");
-            Object sizeTitle = (checkBox).removeIf(x -> {
-                if (x.get("sel") != null)
-                    selProductID.append(x.get("id"));
-                return false;
-            });
+        int selProductID = -1;
+        Map<String, Object> checkBox = (Map<String, Object>) objectSendProp.get("check_box_prop");
+
+        if (checkBox == null) {
+            checkBox = (Map<String, Object>) product.getProductAttributes().get("check_box_prop");
         }
+
+        for (Map.Entry<String, Object> sdfsfef : checkBox.entrySet())
+        {
+            Map<String, Object> x = (Map<String, Object>) sdfsfef.getValue();
+            if (x.get("sel") != null)
+                selProductID = Integer.parseInt(sdfsfef.getKey());
+        }
+
         String count = objectSendProp.get("count") != null ?
                 String.valueOf(objectSendProp.get("count")) :
                 ((List<Map<String, String>>) product.getProductAttributes().get("count_property")).get(0).get("count");
@@ -69,18 +71,18 @@ public class ChartFunc {
                 objectSend.getProperty().get("productId") :
                 product.getId());
 
-        productCh.put("selId", Integer.parseInt(selProductID.toString()));
+        productCh.put("selId", selProductID);
         productList.add(productCh);
 
         chartDAO.updateOrAdd(chart);
 
         try {
             String productTitle = String.valueOf(product.getProductAttributes().get("title"));
-            String productSelected = String.valueOf(checkBox.stream().filter(x -> x.get("sel") != null).findFirst().get().get("tit"));
+
             String measurement = String.valueOf(productAttributes.get("measurement"));
             startBotUser.execute(AnswerCallbackQuery.builder()
                     .callbackQueryId(startBotUser.update.getCallbackQuery().getId())
-                    .text("Добавленно в корзину -> "+ productTitle+"("+productSelected+") "+count + measurement)
+                    .text("Добавленно в корзину -> "+ productTitle+"("+selProductID+") "+count + measurement)
                     .build());
         } catch (TelegramApiException e) {
             throw new RuntimeException(e);
@@ -88,6 +90,7 @@ public class ChartFunc {
     }
     public static void edit(StartBotUser startBotUser, ObjectSend objectSend)
     {
+        logger.info("<< edit");
         ChartDAO chartDAO = new ChartDAOimpl();
 
         InlineKeyboardMarkup kb = new InlineKeyboardMarkup();

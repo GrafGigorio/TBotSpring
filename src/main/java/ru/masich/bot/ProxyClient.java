@@ -1,5 +1,7 @@
 package ru.masich.bot;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import ru.masich.StartBotUser;
@@ -8,9 +10,9 @@ import ru.masich.bot.Client.ClientButton;
 import ru.masich.bot.Client.ClientMessage;
 import ru.masich.bot.Client.ClientPreCheckoutQuery;
 import ru.masich.bot.DAO.IMPL.AwaitDAOimpl;
+import ru.masich.bot.DAO.IMPL.UserBotDAOImpl;
 import ru.masich.bot.DAO.interfaces.AwaitDao;
 import ru.masich.bot.DAO.interfaces.UserBotDAO;
-import ru.masich.bot.DAO.IMPL.UserBotDAOImpl;
 import ru.masich.bot.entity.Await;
 import ru.masich.bot.entity.UserBot;
 
@@ -21,11 +23,13 @@ public class ProxyClient {
     public UserBot userBot;
     public Await await;
     public final static int shopID = 29;
+    Logger logger = LoggerFactory.getLogger(ProxyClient.class);
     public ProxyClient(StartBotUser startBotUser) {
         this.startBotUser = startBotUser;
     }
 
     public void proxy() throws TelegramApiException {
+        logger.info("<< proxy");
         //Предчек
         if(startBotUser.update.hasPreCheckoutQuery()) {
             getFrom(startBotUser.update.getPreCheckoutQuery().getFrom());
@@ -63,6 +67,7 @@ public class ProxyClient {
 
     private void getFrom(User user)
     {
+        logger.info("<< getFrom");
         UserBot userBotTh = userBotDAO.getUserBot(user);
         //Проверяем если пользователь в базе если есть проверяем изменились ли у него поля, если поменялись, тогда обновляем егов базе
         if(userBotTh == null)

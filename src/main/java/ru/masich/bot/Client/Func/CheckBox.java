@@ -1,5 +1,7 @@
 package ru.masich.bot.Client.Func;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.json.JSONObject;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 
@@ -9,8 +11,10 @@ import java.util.List;
 import java.util.Map;
 
 public class CheckBox {
+    static Logger logger = LogManager.getLogger(CheckBox.class);
     public static List<List<InlineKeyboardButton>> check(Map<String, Object> objectSendProperty, String objectId)
     {
+        logger.info("<<  check");
         List<List<InlineKeyboardButton>> lines = new ArrayList<>();
         if(objectSendProperty.get("check_box_prop") != null) {
             Map<String, Map<String, String>> size = (Map<String, Map<String, String>>) objectSendProperty.get("check_box_prop");

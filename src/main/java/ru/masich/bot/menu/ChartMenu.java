@@ -1,5 +1,7 @@
 package ru.masich.bot.menu;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.json.JSONObject;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
@@ -22,8 +24,11 @@ import java.util.Map;
 public class ChartMenu {
     private static ChartDAO chartDAO = new ChartDAOimpl();
     private static ProductDAO productDAO = new ProductDAOimpl();
+    static Logger logger = LogManager.getLogger(ChartMenu.class);
 
     public static void sendActiveChart(UserBot userBot, String title) throws TelegramApiException {
+
+        logger.info("<< sendActiveChart");
 
         Chart chart = chartDAO.getActiveChart(userBot.getTgId());
         StringBuilder stringBuilder = new StringBuilder();
@@ -39,8 +44,17 @@ public class ChartMenu {
             Product product1 = productDAO.get((Integer) product.get("productId"));
             Map<String, Object> prodictAtr = product1.getProductAttributes();
 
-            String selected = (String) ((List<Map<String,Object>>)prodictAtr.get("check_box_prop")).get((Integer) product.get("selId") - 1).get("tit");
-
+            Map<String , Object> checks = (Map<String, Object>) prodictAtr.get("check_box_prop");
+                 //   .get((Integer) product.get("selId") - 1).get("tit");
+            String selected = "";
+            for(Map.Entry<String , Object> ddas : checks.entrySet())
+            {
+                Map<String , Object> dsq = (Map<String, Object>) ddas.getValue();
+                if(dsq.get("sel") != null)
+                {
+                    selected = (String) dsq.get("tit");
+                }
+            }
             stringBuilder.append(prodictAtr.get("title") + "("+selected+") количество: " + product.get("count") + (product1.getProductAttributes()).get("measurement"));
             stringBuilder.append("\r\n");
 

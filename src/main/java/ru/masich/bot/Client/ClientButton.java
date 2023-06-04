@@ -1,5 +1,7 @@
 package ru.masich.bot.Client;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.send.SendSticker;
@@ -21,7 +23,9 @@ import java.util.List;
 
 public class ClientButton {
     public static ProxyClient proxyClient;
+    static Logger logger = LoggerFactory.getLogger(ClientButton.class);
     public static void execute(ProxyClient proxyClient) throws TelegramApiException {
+        logger.info("<<  execute");
         ClientButton.proxyClient = proxyClient;
         CallbackQuery callbackQuery = proxyClient.startBotUser.update.getCallbackQuery();
 
@@ -78,7 +82,5 @@ public class ClientButton {
                 }
             }
         }
-
-
     }
 }

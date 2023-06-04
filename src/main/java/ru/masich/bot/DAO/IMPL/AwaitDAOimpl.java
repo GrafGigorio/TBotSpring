@@ -2,6 +2,8 @@ package ru.masich.bot.DAO.IMPL;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.masich.bot.DAO.interfaces.AwaitDao;
 import ru.masich.bot.Var;
 import ru.masich.bot.entity.Await;
@@ -11,8 +13,8 @@ import java.util.List;
 public class AwaitDAOimpl implements AwaitDao {
 
     SessionFactory sessionFactory;
-
     Session session;
+    static Logger logger = LoggerFactory.getLogger(AwaitDAOimpl.class);
 
     public AwaitDAOimpl() {
         this.sessionFactory = Var.sessionFactory;
@@ -21,6 +23,7 @@ public class AwaitDAOimpl implements AwaitDao {
 
     @Override
     public Await saveOrUpdate(Await await) {
+        logger.info("<<  saveOrUpdate await "+ await);
         //Session session = sessionFactory.getCurrentSession();
         try {
             session.beginTransaction();
@@ -35,6 +38,7 @@ public class AwaitDAOimpl implements AwaitDao {
     @Override
     public Await set(Await await) {
         //Session session = sessionFactory.getCurrentSession();
+        logger.info("<<  set await " + await);
         try {
             session.beginTransaction();
             session.save(await);
@@ -48,6 +52,7 @@ public class AwaitDAOimpl implements AwaitDao {
 
     @Override
     public Await get(Long userid) {
+        logger.info("<<  get userid " + userid);
         try {
             session.beginTransaction();
             return session.createQuery("from Await where userid="+userid, Await.class).getSingleResult();
@@ -63,6 +68,7 @@ public class AwaitDAOimpl implements AwaitDao {
     }
     @Override
     public List<Await> getAll(Long userid) {
+        logger.info("<<  getAll userid " + userid);
         //Session session = sessionFactory.getCurrentSession();
         try {
             //session.beginTransaction();
@@ -76,6 +82,7 @@ public class AwaitDAOimpl implements AwaitDao {
 
     @Override
     public Await delete(Await await) {
+        logger.info("<<  delete");
         //Session session = sessionFactory.getCurrentSession();
         try {
             session = sessionFactory.openSession();

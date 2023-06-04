@@ -147,6 +147,7 @@ public class Product {
             upd.append("\r\n");
         }
 
+
         Map<String,Object> localParams = productAttributes;
         Map<String,Object> remoteParams = o.getProductAttributes();
 
@@ -167,6 +168,16 @@ public class Product {
             upd.append("\r\nна ");
             upd.append(remoteParams.get("main_photo"));
             upd.append("\r\n");
+        }
+
+        String localMes = localParams.get("measurement").toString();
+        String remoteMes = remoteParams.get("measurement").toString();
+
+        if(!localMes.equals(remoteMes))
+        {
+            upd.append("Товар id: ");
+            upd.append(id);
+            upd.append(" будет именено свойство еденицы измерения \r\n");
         }
 
         Map<String,Map<String,String>> localSize = (Map<String, Map<String, String>>) localParams.get("check_box_prop");
