@@ -22,11 +22,11 @@ import java.util.Map;
 
 public class Proxy {
 
-    private StoreDao storeDao = new StoreDAOimpl();
-    private AwaitDao awaitDao = new AwaitDAOimpl();
-    private UserBotDAO userBotDAO = new UserBotDAOImpl();
-    private LastMessageDAO lastMessageDAO = new LastMessageDAOimpl();
-    private CatalogDAO catalogDAO = new CatalogDAOimpl();
+    private final StoreDao storeDao = new StoreDAOimpl();
+    private final AwaitDao awaitDao = new AwaitDAOimpl();
+    private final UserBotDAO userBotDAO = new UserBotDAOImpl();
+    private final LastMessageDAO lastMessageDAO = new LastMessageDAOimpl();
+    private final CatalogDAO catalogDAO = new CatalogDAOimpl();
     private StartBot startBot;
     private Update update;
     private UserBot userBot;
@@ -63,14 +63,14 @@ public class Proxy {
             }
 
             Long objId = -1L;
-            Long objId2 = -1L;
+            long objId2 = -1L;
             Long objId3 = -1L;
             String mes = "";
             String[] comandSeq = await.getCommand().split(":");
             if(comandSeq.length > 2)
             {
                 if(comandSeq.length > 3)
-                    objId2 = Long.valueOf(comandSeq[3]);
+                    objId2 = Long.parseLong(comandSeq[3]);
                 if(comandSeq.length > 4)
                     objId3 = Long.valueOf(comandSeq[4]);
                 objId = Long.valueOf(comandSeq[2]);
@@ -122,6 +122,7 @@ public class Proxy {
                     awaitDao.delete(await);
                     messageBot.sendMessage("Каталог " + update.getMessage().getText() + " успешно созданн!");
                     Message message = null;
+                    assert catalog != null;
                     ru.masich.bot.entity.Catalog catalog1 = catalogDAO.get(catalog.getFatherId());
                     if(objId2 == -1L)
                         message = sendMenu(userBot.getTgId(),Var.catalogGetMasterTitle, CatalogMenu.getCatalogMenu(objId,objId2,objId3, storeDao.getStore(catalog.getShopId()).getTitle()));
@@ -182,7 +183,7 @@ public class Proxy {
         //Обработка сообщений
         if(update.getMessage() != null)
         {
-            messageBot.execute(update);
+            messageBot.execute();
         }
         //Обработка кнопок меню
         if(update.getCallbackQuery() != null)
@@ -206,11 +207,13 @@ public class Proxy {
         //Проверяем если пользователь в базе если есть проверяем изменились ли у него поля, если поменялись, тогда обновляем егов базе
         if(userBotTh == null)
         {
+            assert user != null;
             userBotDAO.save(new UserBot(user));
         }
         if(userBotTh != null && !userBotTh.equalsUt(user))
         {
             //Берем данные от сервера телеги
+            assert user != null;
             UserBot userBot2 = new UserBot(user);
             //Прописываем id
             userBot2.setId(userBotTh.getId());

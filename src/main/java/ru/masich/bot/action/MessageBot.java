@@ -1,6 +1,5 @@
 package ru.masich.bot.action;
 
-import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -18,9 +17,9 @@ import ru.masich.bot.menu.CatalogMenu;
 
 public class MessageBot {
     private StartBot startBot;
-    private LastMessageDAO lastMessageDAO = new LastMessageDAOimpl();
-    private UserBotDAO userBotDAO = new UserBotDAOImpl();
-    private  Update update;
+    private final LastMessageDAO lastMessageDAO = new LastMessageDAOimpl();
+    private final UserBotDAO userBotDAO = new UserBotDAOImpl();
+    private Update update;
     private UserBot userBot;
     static Logger logger = LogManager.getLogger(MessageBot.class);
     public MessageBot(StartBot startBot, Update update,UserBot userBot) {
@@ -29,9 +28,9 @@ public class MessageBot {
         this.userBot = userBot;
     }
 
-    public void execute(Update update)
+    public void execute()
     {
-        logger.log(Level.INFO,"<<");
+        logger.info("<< execute " + update.getMessage().getText());
         //Проверяем пользователя на наличие его в наших списках
         //getFrom(update);
 
@@ -54,7 +53,7 @@ public class MessageBot {
     }
     public Message sendMessage(String mes)
     {
-        logger.log(Level.INFO,"<<");
+        logger.info("<< sendMessage mes " + mes);
         SendMessage smd = SendMessage.builder().chatId(userBot.getTgId())
                 .text(mes).build();
         try {
@@ -65,7 +64,7 @@ public class MessageBot {
     }
     public Message sendMenu(SendMessage menu)
     {
-        logger.log(Level.INFO,"<<");
+        logger.info("<< sendMenu menu " + menu.getText());
         try {
             return startBot.execute(menu);
         } catch (TelegramApiException e) {

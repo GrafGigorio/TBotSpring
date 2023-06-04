@@ -9,5 +9,6 @@ public class ClientAwait {
     public static void execute(ProxyClient proxyClient)
     {
         logger.info("<< execute");
+        System.out.println(proxyClient);
     }
 }
