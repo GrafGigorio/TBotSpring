@@ -52,7 +52,7 @@ public class ClientButton {
             String[] arr = callbackQuery.getData().split(":");
             CatalogDAO catalogDAO = new CatalogDAOimpl();
             ProductDAO productDAO = new ProductDAOimpl();
-            //Получаем дочерние каталоги
+            //Получаем дочерние каталоги0
             List<Catalog> catalogs = catalogDAO.getChildren(Long.valueOf(arr[2]));
             //Получаем продукты
             List<Product> products = productDAO.getCatalog(Long.valueOf(arr[2]));
