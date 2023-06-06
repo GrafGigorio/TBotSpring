@@ -30,7 +30,7 @@ public class Var {
     public static SessionFactory getSessionFactory()
     {
         return new Configuration()
-                .configure()
+                .configure("hibernate.cfg.xml")
                 .buildSessionFactory();
     }
 }

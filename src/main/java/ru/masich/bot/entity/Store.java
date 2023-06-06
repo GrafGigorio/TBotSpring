@@ -2,6 +2,7 @@ package ru.masich.bot.entity;
 
 
 import javax.persistence.*;
+import java.util.Map;
 import java.util.Objects;
 
 @Entity
@@ -13,13 +14,14 @@ public class Store {
     private Long id;
     private Long userid;
     private String title;
+    @Convert(converter = HashMapConverter.class)
+    private Map<String, Object> role;
 
-    public Store(Long userid, String title) {
+
+    public Store(Long userid, String title, Map<String, Object> role) {
         this.userid = userid;
         this.title = title;
-    }
-    public Store(String title) {
-        this.title = title;
+        this.role = role;
     }
 
     public Store() {
@@ -57,6 +59,14 @@ public class Store {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public Map<String, Object> getRole() {
+        return role;
+    }
+
+    public void setRole(Map<String, Object> role) {
+        this.role = role;
     }
 
     @Override

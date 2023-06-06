@@ -17,6 +17,7 @@ import ru.masich.bot.entity.*;
 import ru.masich.bot.menu.CatalogMenu;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -38,7 +39,7 @@ public class Proxy {
 
     public void proxy(Update update)
     {
-        logger.info("<<");
+        logger.info("<< proxy " + update.getCallbackQuery() != null ? update.getCallbackQuery() : update.getMessage());
         this.update = update;
         getFrom(update);//Сохраняем поле пользователя userBot и проверяем наличие обновлений полей
 
@@ -88,11 +89,25 @@ public class Proxy {
             {
                 //Создание магазина
                 case Var.createStore -> {
-                    Store store = new Store(userBot.getId(),update.getMessage().getText());
+
+                    //Роль в магазин
+                    Map<String, Object> roleShop = new LinkedHashMap<>();
+                    roleShop.put(String.valueOf(userBot.getId()),0);
+                    Store store = new Store(userBot.getId(),update.getMessage().getText(),roleShop);
                     storeDao.saveOrUpdateStore(store);
+                    //Роль в пользователя
+                    Map<String, Object> roleUser = userBot.getRole();
+                    roleUser.put(String.valueOf(store.getId()), 0);
+                    userBotDAO.update(userBot);
+
+
                     awaitDao.delete(await);
                     messageBot.sendMessage("Магазин " + update.getMessage().getText() + " успешно созданн!");
-                    messageBot.sendMenu(CatalogMenu.getStartMenu(userBot));
+                    Message message = messageBot.sendMenu(CatalogMenu.getStartMenu(userBot));
+                    //Ползунок последнего сообщения
+                    LastMessage lastMessage = lastMessageDAO.getLastMessage(userBot.getId());
+                    lastMessage.setLastMessageId(message.getMessageId().longValue());
+                    lastMessageDAO.updateLastMessage(lastMessage);
                 }
                 //Переименовывание магазина
                 case Var.storeEdit -> {
@@ -102,7 +117,7 @@ public class Proxy {
                     storeDao.saveOrUpdateStore(store);
                     messageBot.sendMessage("Магазин #"+ store.getId() + "  переименован на "+store.getTitle());
                     Message message = sendMenu(userBot.getTgId(),Var.getStoresTitle, CatalogMenu.getStoresList(userBot));
-
+                    //Ползунок последнего сообщения
                     LastMessage lastMessage = lastMessageDAO.getLastMessage(userBot.getId());
                     lastMessage.setLastMessageId(message.getMessageId().longValue());
                     lastMessageDAO.updateLastMessage(lastMessage);
@@ -194,7 +209,7 @@ public class Proxy {
 
     private void getFrom(Update update)
     {
-        logger.info("<<");
+        logger.info("<< getFrom " );
         UserBot userBotTh = null;
         User user = null;
 
@@ -221,10 +236,11 @@ public class Proxy {
             userBotDAO.update(userBot2);
         }
         userBot = userBotTh;
+        logger.info("<< getFrom " + userBot.getFirstName() + " " + userBot.getLastName());
     }
 
     public Message sendMenu(Long who, String txt, InlineKeyboardMarkup kb) {
-        logger.info("<<");
+        logger.info("<< sendMenu " + txt);
         SendMessage sm = SendMessage.builder().chatId(who.toString())
                 .parseMode("HTML").text(txt)
                 .replyMarkup(kb).build();

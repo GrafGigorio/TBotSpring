@@ -8,9 +8,11 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKe
 import ru.masich.bot.DAO.IMPL.CatalogDAOimpl;
 import ru.masich.bot.DAO.IMPL.ProductDAOimpl;
 import ru.masich.bot.DAO.IMPL.StoreDAOimpl;
+import ru.masich.bot.DAO.IMPL.UserBotDAOImpl;
 import ru.masich.bot.DAO.interfaces.CatalogDAO;
 import ru.masich.bot.DAO.interfaces.ProductDAO;
 import ru.masich.bot.DAO.interfaces.StoreDao;
+import ru.masich.bot.DAO.interfaces.UserBotDAO;
 import ru.masich.bot.Var;
 import ru.masich.bot.entity.Product;
 import ru.masich.bot.entity.Store;
@@ -18,11 +20,13 @@ import ru.masich.bot.entity.UserBot;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class CatalogMenu {
     private static List<List<InlineKeyboardButton>> storeLines = new ArrayList<>();
     private static CatalogDAO catalogDAO = new CatalogDAOimpl();
     private static StoreDao storeDao = new StoreDAOimpl();
+    private static UserBotDAO userBotDAO = new UserBotDAOImpl();
     static Logger logger = LogManager.getLogger(CatalogMenu.class);
     public static SendMessage getStartMenu(UserBot userBot)
     {
@@ -85,9 +89,13 @@ public class CatalogMenu {
     }
     public static InlineKeyboardMarkup getStoresList(Long userBotId) {
         logger.info("<< getStoresList");
-        List<Store> stores = storeDao.getAllUserStores(userBotId);
+
+        Map<String, Object> accesStores = userBotDAO.getUserBot(userBotId).getRole();
         storeLines = new ArrayList<>();
-        for (Store store : stores) {
+
+        for (Map.Entry<String, Object> acced : accesStores.entrySet())
+        {
+            Store store = storeDao.getStore(Long.valueOf(acced.getKey()));
             List<InlineKeyboardButton> line = new ArrayList<>();
             line.add(
                     InlineKeyboardButton
@@ -101,6 +109,37 @@ public class CatalogMenu {
         storeLines.add(List.of(InlineKeyboardButton.builder().text("◀ Назад").callbackData(Var.startMenu).build()));
 
         return InlineKeyboardMarkup.builder().keyboard(storeLines)
+                .build();
+    }
+    public static InlineKeyboardMarkup getPermission(Long shopId) {
+        logger.info("<< getPermission");
+
+        Map<String, Object> accesUsers = storeDao.getStore(shopId).getRole();
+
+        List<List<InlineKeyboardButton>> but = new ArrayList<>();
+
+        for (Map.Entry<String, Object> acced : accesUsers.entrySet())
+        {
+            UserBot userBot = userBotDAO.getUserBot(Long.valueOf(acced.getKey()));
+            List<InlineKeyboardButton> line = new ArrayList<>();
+            line.add(
+                    InlineKeyboardButton
+                            .builder()
+                            .text("\uD83D\uDDC2 №" + userBot.getId() + " " + userBot.getFirstName() + " " + userBot.getLastName())
+                            .callbackData("store:user:" + userBot.getId())
+                            .build());
+            line.add(
+                    InlineKeyboardButton
+                            .builder()
+                            .text("❌")
+                            .callbackData("store:delUser:" +shopId +":" + userBot.getId())
+                            .build());
+            but.add(line);
+        }
+
+        but.add(List.of(InlineKeyboardButton.builder().text("◀ Назад").callbackData(Var.storeGet + shopId).build()));
+
+        return InlineKeyboardMarkup.builder().keyboard(but)
                 .build();
     }
 
@@ -164,6 +203,13 @@ public class CatalogMenu {
                         .builder()
                         .text("✅\uFE0F Проверить результат загрузки в программу✅\uFE0F")
                         .callbackData("store:check:"+store.getId())
+                        .build()
+        ));
+        storeLines.add(List.of(
+                InlineKeyboardButton
+                        .builder()
+                        .text("Управление ролями")
+                        .callbackData("store:permissions:"+store.getId())
                         .build()
         ));
 

@@ -5,6 +5,8 @@ import org.hibernate.annotations.NaturalId;
 import org.telegram.telegrambots.meta.api.objects.User;
 
 import javax.persistence.*;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Objects;
 
 @Entity
@@ -26,6 +28,8 @@ public class UserBot {
     private Boolean supportInlineQueries;
     private Boolean isPremium;
     private Boolean addedToAttachmentMenu;
+    @Convert(converter = HashMapConverter.class)
+    private Map<String, Object> role;
 
 //    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 //    @JoinColumn(name = "userid")
@@ -38,7 +42,7 @@ public class UserBot {
     public UserBot() {
     }
 
-    public UserBot(Long tgId, String firstName, Boolean isBot, String lastName, String userName, String languageCode, Boolean canJoinGroups, Boolean canReadAllGroupMessages, Boolean supportInlineQueries, Boolean isPremium, Boolean addedToAttachmentMenu) {
+    public UserBot(Long tgId, String firstName, Boolean isBot, String lastName, String userName, String languageCode, Boolean canJoinGroups, Boolean canReadAllGroupMessages, Boolean supportInlineQueries, Boolean isPremium, Boolean addedToAttachmentMenu, Map<String, Object> role) {
         user = new User(tgId,firstName,isBot,lastName,userName,languageCode,canJoinGroups,canReadAllGroupMessages,supportInlineQueries,isPremium,addedToAttachmentMenu);
         this.tgId = tgId;
         this.firstName = firstName;
@@ -51,6 +55,7 @@ public class UserBot {
         this.supportInlineQueries = supportInlineQueries;
         this.isPremium = isPremium;
         this.addedToAttachmentMenu = addedToAttachmentMenu;
+        this.role = role;
     }
     public UserBot(User user) {
         this.user = user;
@@ -65,6 +70,7 @@ public class UserBot {
         this.supportInlineQueries = user.getSupportInlineQueries();
         this.isPremium = user.getIsPremium();
         this.addedToAttachmentMenu = user.getAddedToAttachmentMenu();
+        this.role = new LinkedHashMap<>();
     }
 
 
@@ -83,6 +89,7 @@ public class UserBot {
                 ",\t\n supportInlineQueries=" + supportInlineQueries +
                 ",\t\n isPremium=" + isPremium +
                 ",\t\n addedToAttachmentMenu=" + addedToAttachmentMenu +
+                ",\t\n role=" + role +
                 '}';
     }
 
@@ -191,6 +198,14 @@ public class UserBot {
         this.addedToAttachmentMenu = addedToAttachmentMenu;
     }
 
+    public Map<String, Object> getRole() {
+        return role;
+    }
+
+    public void setRole(Map<String, Object> role) {
+        this.role = role;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -208,8 +223,10 @@ public class UserBot {
                 Objects.equals(supportInlineQueries, userBot.supportInlineQueries) &&
                 Objects.equals(isPremium, userBot.isPremium) &&
                 Objects.equals(addedToAttachmentMenu, userBot.addedToAttachmentMenu) &&
+                Objects.equals(role, userBot.role) &&
                 Objects.equals(user, userBot.user);
     }
+
     public boolean equalsUt(User o) {
 
         if(o == null || o.getClass() != User.class) return false;

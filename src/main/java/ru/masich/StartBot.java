@@ -1,6 +1,8 @@
 package ru.masich;
 
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import ru.masich.bot.Proxy;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -17,6 +19,7 @@ public class StartBot extends TelegramLongPollingBot {
 
     @Value("${bot.token}")
     private String token;
+    static Logger logger = LogManager.getLogger(StartBot.class);
 
     @Override
     public void onRegister() {
@@ -25,6 +28,7 @@ public class StartBot extends TelegramLongPollingBot {
 
     @Override
     public void onUpdateReceived(Update update) {
+        logger.info("<< onUpdateReceived <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
         Proxy proxy = new Proxy(this);
         proxy.proxy(update);
     }

@@ -68,7 +68,7 @@ public class AwaitDAOimpl implements AwaitDao {
     }
     @Override
     public List<Await> getAll(Long userid) {
-        logger.info("<<  getAll userid " + userid);
+        logger.info("<<  getAll Await userid " + userid);
         //Session session = sessionFactory.getCurrentSession();
         try {
             //session.beginTransaction();

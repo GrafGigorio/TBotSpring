@@ -22,6 +22,8 @@ import ru.masich.bot.entity.Store;
 import ru.masich.bot.entity.UserBot;
 import ru.masich.bot.menu.CatalogMenu;
 
+import java.util.Map;
+
 public class Button {
     public StartBot startBot;
     private LastMessageDAO lastMessageDAO = new LastMessageDAOimpl();
@@ -32,14 +34,13 @@ public class Button {
 
     Logger logger = LoggerFactory.getLogger(Button.class);
     public Button(StartBot startBot, Update update) {
-        logger.info("<<");
         this.startBot = startBot;
         this.update = update;
     }
 
     public void execute(Update update)
     {
-        logger.info("<<");
+        logger.info("<< execute " + update.getCallbackQuery().getData());
         UserBot userBot = userBotDAO.getUserBot(update.getCallbackQuery().getFrom());
         CatalogDAO catalogDAO = new CatalogDAOimpl();
 
@@ -92,6 +93,9 @@ public class Button {
             }
             case Var.storeDelete -> {
                 Store store = storeDao.getStore(objId);
+                Map<String, Object> roles = userBot.getRole();
+                roles.remove(String.valueOf(store.getId()));
+                userBotDAO.update(userBot);
                 storeDao.deleteStore(store);
                 editMessage(chatId,callbackId,"Магазин #"+store.getId() +" "+store.getTitle() + " удален!", msgId);
                 Message message = sendMenu(userBot.getTgId(),Var.getStoresTitle, CatalogMenu.getStoresList(userBot.getId()));
@@ -174,6 +178,10 @@ public class Button {
                 Download download = new Download(this, Integer.parseInt(comandSeq[2]));
                 download.check();
             }
+            case "store:permissions:" -> {
+                editMessage(chatId,callbackId,"Права на уппавление магизоном",msgId, CatalogMenu.getPermission(Long.valueOf(Integer.parseInt(comandSeq[2]))));
+
+            }
         }
     }
 
@@ -189,7 +197,7 @@ public class Button {
     }
 
     private void editMessage(Long chatId, String queryId, String data, int msgId) {
-        logger.info("<<");
+        logger.info("<< editMessage " + data);
         EditMessageText newTxt = EditMessageText.builder()
                 .chatId(chatId.toString())
                 .messageId(msgId).text(data).build();
@@ -210,7 +218,7 @@ public class Button {
     }
     private void editMessage(Long chatId, String queryId, String title, int msgId, InlineKeyboardMarkup menu) {
         //--msgId;
-        logger.info("<<");
+        logger.info("<< editMessage 2");
         EditMessageText newTxt = EditMessageText.builder()
                 .chatId(chatId.toString())
                 .messageId(msgId).text(title).build();
@@ -231,7 +239,7 @@ public class Button {
         }
     }
     public Message sendMenu(Long who, String txt, InlineKeyboardMarkup kb) {
-        logger.info("<<");
+        logger.info("<< sendMenu txt");
         SendMessage sm = SendMessage.builder().chatId(who.toString())
                 .parseMode("HTML").text(txt)
                 .replyMarkup(kb).build();
