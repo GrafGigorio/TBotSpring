@@ -96,7 +96,7 @@ public class Button {
                 Map<String, Object> roles = userBot.getRole();
                 roles.remove(String.valueOf(store.getId()));
                 userBotDAO.update(userBot);
-                storeDao.deleteStore(store);
+                storeDao.deleteStore(store);d
                 editMessage(chatId,callbackId,"Магазин #"+store.getId() +" "+store.getTitle() + " удален!", msgId);
                 Message message = sendMenu(userBot.getTgId(),Var.getStoresTitle, CatalogMenu.getStoresList(userBot.getId()));
                 lastMessage.setLastMessageId(message.getMessageId());
