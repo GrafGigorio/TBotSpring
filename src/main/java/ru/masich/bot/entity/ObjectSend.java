@@ -3,7 +3,9 @@ package ru.masich.bot.entity;
 
 import javax.persistence.*;
 import java.util.Map;
-
+/**
+ * Класс отправленного обьекта служит для отслеживания изменений при выборе свойств товара
+ * */
 @Entity
 @Table(name = "object_send")
 public class ObjectSend {
@@ -12,11 +14,11 @@ public class ObjectSend {
     @Column(name = "id")
     private Long id;
     private Long userId;
-    private int objectId;
+    private Long objectId;
     @Convert(converter = HashMapConverter.class)
     private Map<String, Object> property;
 
-    public ObjectSend(Long userId, int objectId, Map<String, Object> propertys) {
+    public ObjectSend(Long userId, Long objectId, Map<String, Object> propertys) {
         this.userId = userId;
         this.objectId = objectId;
         this.property = propertys;
@@ -62,11 +64,11 @@ public class ObjectSend {
         this.userId = userId;
     }
 
-    public int getObjectId() {
+    public Long getObjectId() {
         return objectId;
     }
 
-    public void setObjectId(int objectId) {
+    public void setObjectId(Long objectId) {
         this.objectId = objectId;
     }
 }

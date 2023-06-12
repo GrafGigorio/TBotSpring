@@ -24,7 +24,7 @@ public class CatalogDAOimpl implements CatalogDAO {
 
     @Override
     public List<Catalog> getCatalogAllStore(Long shopid) {
-        logger.info("<< getCatalogAllStore shopid " + shopid);
+        logger.info("("+this.getClass().getSimpleName()+".java:"+new Throwable().getStackTrace()[0].getLineNumber()+")"+"<< getCatalogAllStore shopid " + shopid);
         try {
             session = sessionFactory.openSession();
             session.beginTransaction();
@@ -38,7 +38,7 @@ public class CatalogDAOimpl implements CatalogDAO {
 
     @Override
     public List<Catalog> getChildren(Long section) {
-        logger.info("<< getChildren section " + section);
+        logger.info("("+this.getClass().getSimpleName()+".java:"+new Throwable().getStackTrace()[0].getLineNumber()+")"+"<< getChildren section " + section);
         try {
             session = sessionFactory.openSession();
             session.beginTransaction();
@@ -50,7 +50,7 @@ public class CatalogDAOimpl implements CatalogDAO {
 
     @Override
     public Catalog get(Long catalogID) {
-        logger.info("<< get Long catalogID " + catalogID);
+        logger.info("("+this.getClass().getSimpleName()+".java:"+new Throwable().getStackTrace()[0].getLineNumber()+")"+"<< get Long catalogID " + catalogID);
         try {
             session = sessionFactory.openSession();
             session.beginTransaction();
@@ -62,7 +62,7 @@ public class CatalogDAOimpl implements CatalogDAO {
 
     @Override
     public Catalog get(int catalogID) {
-        logger.info("<< get int catalogID " + catalogID);
+        logger.info("("+this.getClass().getSimpleName()+".java:"+new Throwable().getStackTrace()[0].getLineNumber()+")"+"<< get int catalogID " + catalogID);
         try {
             session = sessionFactory.openSession();
             session.beginTransaction();
@@ -74,7 +74,7 @@ public class CatalogDAOimpl implements CatalogDAO {
 
     @Override
     public Catalog get(String catalogID) {
-        logger.info("<< get String catalogID " + catalogID);
+        logger.info("("+this.getClass().getSimpleName()+".java:"+new Throwable().getStackTrace()[0].getLineNumber()+")"+"<< get String catalogID " + catalogID);
         try {
             session = sessionFactory.openSession();
             session.beginTransaction();
@@ -90,7 +90,7 @@ public class CatalogDAOimpl implements CatalogDAO {
 
     @Override
     public void set(Catalog section) {
-        logger.info("<< set section " + section);
+        logger.info("("+this.getClass().getSimpleName()+".java:"+new Throwable().getStackTrace()[0].getLineNumber()+")"+"<< set section " + section);
         try {
             session = sessionFactory.openSession();
             session.beginTransaction();
@@ -103,7 +103,7 @@ public class CatalogDAOimpl implements CatalogDAO {
 
     @Override
     public void delete(Catalog catalog) {
-        logger.info("<< delete catalog " + catalog);
+        logger.info("("+this.getClass().getSimpleName()+".java:"+new Throwable().getStackTrace()[0].getLineNumber()+")"+"<< delete catalog " + catalog);
         try {
             session = sessionFactory.openSession();
             session.beginTransaction();
@@ -119,7 +119,7 @@ public class CatalogDAOimpl implements CatalogDAO {
 
     @Override
     public void update(Catalog section) {
-        logger.info("<< update section " + section);
+        logger.info("("+this.getClass().getSimpleName()+".java:"+new Throwable().getStackTrace()[0].getLineNumber()+")"+"<< update section " + section);
         try {
             session = sessionFactory.openSession();
             session.beginTransaction();

@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface ChartDAO {
     Chart getActiveChart(Long userId);
-    Chart get(int chartId);
+    Chart get(Long chartId);
     List<Chart> getClosedChartList(int userId);
     Chart updateOrAdd(Chart chart);
 }

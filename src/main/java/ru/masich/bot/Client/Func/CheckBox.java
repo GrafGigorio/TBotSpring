@@ -14,7 +14,7 @@ public class CheckBox {
     static Logger logger = LogManager.getLogger(CheckBox.class);
     public static List<List<InlineKeyboardButton>> check(Map<String, Object> objectSendProperty, String objectId)
     {
-        logger.info("<<  check");
+        logger.info("(CheckBox.java:"+new Throwable().getStackTrace()[0].getLineNumber()+")"+"<<  check");
         List<List<InlineKeyboardButton>> lines = new ArrayList<>();
         if(objectSendProperty.get("check_box_prop") != null) {
             Map<String, Map<String, String>> size = (Map<String, Map<String, String>>) objectSendProperty.get("check_box_prop");

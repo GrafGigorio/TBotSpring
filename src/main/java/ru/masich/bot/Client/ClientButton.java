@@ -28,27 +28,29 @@ public class ClientButton {
 
         ClientButton.proxyClient = proxyClient;
         CallbackQuery callbackQuery = proxyClient.startBotUser.update.getCallbackQuery();
-        logger.info("<< execute " + callbackQuery.getData());
+        logger.info("(ClientButton"+".java:"+new Throwable().getStackTrace()[0].getLineNumber()+")"+"<< execute " + callbackQuery.getData());
 
-        String  sd = callbackQuery.getData();
+
         //если префикс обьекта objectId
         if(callbackQuery.getData().contains("objId"))
         {
-            logger.info("<< execute objId ");
+            logger.info("(ClientButton"+".java:"+new Throwable().getStackTrace()[0].getLineNumber()+")"+"<< execute objId ");
             ActionProxy actionProxy = new ActionProxy(proxyClient);
             actionProxy.proxy();
+            return;
         }
-        //если редактирование корзины
-        if(callbackQuery.getData().contains("chartEdit"))
+        //если префикс обьекта bigObj
+        if(callbackQuery.getData().contains("bigObj"))
         {
-            logger.info("<< execute chartEdit");
-            ActionProxy actionProxy = new ActionProxy(proxyClient);
-            actionProxy.proxy();
+            logger.info("(ClientButton"+".java:"+new Throwable().getStackTrace()[0].getLineNumber()+")"+"<< execute bigObj ");
+            ClientBigObject.process(proxyClient);
+            return;
         }
+
         //Если нажата кнопка получения каталога
         if(callbackQuery.getData().contains(Var.catalogGet))
         {
-            logger.info("<< execute chartEdit " + Var.catalogGet);
+            logger.info("(ClientButton"+".java:"+new Throwable().getStackTrace()[0].getLineNumber()+")"+"<< execute chartEdit " + Var.catalogGet);
             String[] arr = callbackQuery.getData().split(":");
             CatalogDAO catalogDAO = new CatalogDAOimpl();
             ProductDAO productDAO = new ProductDAOimpl();

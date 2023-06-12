@@ -10,7 +10,7 @@ import ru.masich.bot.ProxyClient;
 public class ClientPreCheckoutQuery {
     static Logger logger = LogManager.getLogger(ClientPreCheckoutQuery.class);
     public static void execute(ProxyClient proxyClient) {
-        logger.info("<< execute");
+        logger.info("(ClientPreCheckoutQuery"+".java:"+new Throwable().getStackTrace()[0].getLineNumber()+")"+"<< execute");
         PreCheckoutQuery pre = proxyClient.startBotUser.update.getPreCheckoutQuery();
         AnswerPreCheckoutQuery answerPreCheckoutQuery = new AnswerPreCheckoutQuery();
         answerPreCheckoutQuery.setPreCheckoutQueryId(pre.getId());

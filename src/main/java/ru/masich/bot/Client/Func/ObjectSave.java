@@ -9,8 +9,8 @@ import ru.masich.bot.entity.ObjectSend;
 public class ObjectSave {
     static Logger logger = LogManager.getLogger(ObjectSave.class);
 
-    public static void save(Long id, Long tgUser, int objectId) {
-        logger.info("<<  save id " + id + " tgUser " + tgUser + " objectId " + objectId);
+    public static void save(Long id, Long tgUser, Long objectId) {
+        logger.info("(ObjectSave.java:"+new Throwable().getStackTrace()[0].getLineNumber()+")"+"<<  save id " + id + " tgUser " + tgUser + " objectId " + objectId);
         ObjectSendDAO objectSendDAO = new ObjectSendDAOimpl();
         ObjectSend objectSend = new ObjectSend(tgUser);
         objectSend.setObjectId(objectId);
@@ -20,7 +20,7 @@ public class ObjectSave {
     }
 
     public static Long prepare(Long tgUser) {
-        logger.info("<<  prepare tgUser " + tgUser);
+        logger.info("(ObjectSave.java:"+new Throwable().getStackTrace()[0].getLineNumber()+")"+"<<  prepare tgUser " + tgUser);
         ObjectSendDAO objectSendDAO = new ObjectSendDAOimpl();
         return objectSendDAO.updateObject(new ObjectSend(tgUser)).getId();
     }

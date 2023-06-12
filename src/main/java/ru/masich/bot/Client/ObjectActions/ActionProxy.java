@@ -18,6 +18,7 @@ import ru.masich.bot.DAO.interfaces.ProductDAO;
 import ru.masich.bot.ProxyClient;
 import ru.masich.bot.entity.ObjectSend;
 import ru.masich.bot.entity.Product;
+import ru.masich.bot.menu.ChartMenu;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -35,21 +36,16 @@ public class ActionProxy {
     }
     public void proxy()
     {
-
         CallbackQuery callbackQuery = proxyClient.startBotUser.update.getCallbackQuery();
 
-        logger.info("<< proxy " + callbackQuery.getData());
-        System.out.println(">>>> ");
-        System.out.println(callbackQuery.getData());
-        System.out.println(">>>> ");
+        logger.info("("+this.getClass().getSimpleName()+".java:"+new Throwable().getStackTrace()[0].getLineNumber()+")"+"<< proxy " + callbackQuery.getData());
 
         JSONObject jsonObject = new JSONObject(callbackQuery.getData());
 
-        ObjectSend objectSend = objectSendDAO.getObject(jsonObject.getLong("objId"));
-        int messageId = objectSend.getObjectId();
+        ObjectSend objectSend = objectSendDAO.get(Long.valueOf(jsonObject.getString("objId")));
 
         if(jsonObject.get("act").equals("sbx")) {
-            logger.info("<< proxy act sbx");
+            logger.info("("+this.getClass().getSimpleName()+".java:"+new Throwable().getStackTrace()[0].getLineNumber()+")"+"<< proxy act sbx");
             int productId = (int) objectSend.getProperty().get("productId");
             Product product = productDAO.get(productId);
             Map<String, Object> productAttributes = product.getProductAttributes();
@@ -70,7 +66,7 @@ public class ActionProxy {
             return;
         }
         if(jsonObject.get("act").equals("p")) {
-            logger.info("<< proxy act p");
+            logger.info("("+this.getClass().getSimpleName()+".java:"+new Throwable().getStackTrace()[0].getLineNumber()+")"+"<< proxy act p");
             int productId = (int) objectSend.getProperty().get("productId");
             Product product = productDAO.get(productId);
             Map<String, Object> objectSendProp = objectSend.getProperty();
@@ -86,7 +82,7 @@ public class ActionProxy {
             return;
         }
         if(jsonObject.get("act").equals("m")) {
-            logger.info("<< proxy act m");
+            logger.info("("+this.getClass().getSimpleName()+".java:"+new Throwable().getStackTrace()[0].getLineNumber()+")"+"<< proxy act m");
             int productId = (int) objectSend.getProperty().get("productId");
             Product product = productDAO.get(productId);
             Map<String, Object> objectSendProp = objectSend.getProperty();
@@ -103,7 +99,7 @@ public class ActionProxy {
         }
         //Добавление в корзину
         if(jsonObject.get("act").equals("addChart")) {
-            logger.info("<< proxy act addChart");
+            logger.info("("+this.getClass().getSimpleName()+".java:"+new Throwable().getStackTrace()[0].getLineNumber()+")"+"<< proxy act addChart");
             int productId = (int) objectSend.getProperty().get("productId");
             Product product = productDAO.get(productId);
             ChartFunc.add(proxyClient.startBotUser, objectSend, product);
@@ -111,13 +107,14 @@ public class ActionProxy {
         }
         //Редактируем корзину
         if(jsonObject.get("act").equals("chartEdit")) {
-            logger.info("<< proxy act chartEdit");
-            ChartFunc.edit(proxyClient.startBotUser, objectSend);
+            logger.info("("+this.getClass().getSimpleName()+".java:"+new Throwable().getStackTrace()[0].getLineNumber()+")"+"<< proxy act chartEdit");
+            logger.info(jsonObject.getInt("objId"));
+            new ChartMenu().edit(proxyClient.startBotUser, objectSend);
             return;
         }
         //Оформляем заказ
         if(jsonObject.get("act").equals("chartCommit")) {
-            logger.info("<< proxy act chartCommit");
+            logger.info("("+this.getClass().getSimpleName()+".java:"+new Throwable().getStackTrace()[0].getLineNumber()+")"+"<< proxy act chartCommit");
             return;
         }
 
@@ -125,14 +122,14 @@ public class ActionProxy {
     }
     private void setProperty(ObjectSend objectSend, Product product)
     {
-        logger.info("<< setProperty");
+        logger.info("("+this.getClass().getSimpleName()+".java:"+new Throwable().getStackTrace()[0].getLineNumber()+")"+"<< setProperty");
         Map<String, Object> productAttributes = product.getProductAttributes();
         Map<String, Object> objectSendProp = objectSend.getProperty();
 
         productAttributes.put("check_box_prop",objectSendProp.get("check_box_prop"));
     }
     private void editMessageProductObj(Product product, ObjectSend objectSend) {
-        logger.info("<< editMessageProductObj");
+        logger.info("("+this.getClass().getSimpleName()+".java:"+new Throwable().getStackTrace()[0].getLineNumber()+")"+"<< editMessageProductObj");
         Map<String, Object> productAttributes = product.getProductAttributes();
         Map<String, Object> objectSendProperty = objectSend.getProperty();
         int objectId = Math.toIntExact(objectSend.getId());
@@ -172,12 +169,13 @@ public class ActionProxy {
         //Добавить в кор зину
         Map<String ,Map<String, Object>> checkBox = (Map<String, Map<String, Object>>) objectSendProperty.get("check_box_prop");
 
-        for(Map.Entry<String ,Map<String, Object>> xds : checkBox.entrySet())
-        {
-            Map<String, Object> x = xds.getValue();
-            if (x.get("sel") != null)
-                title.append(x.get("tit"));
-        }
+        if(checkBox != null)
+            for(Map.Entry<String ,Map<String, Object>> xds : checkBox.entrySet())
+            {
+                Map<String, Object> x = xds.getValue();
+                if (x.get("sel") != null)
+                    title.append(x.get("tit"));
+            }
 
 
 
@@ -200,7 +198,7 @@ public class ActionProxy {
         EditMessageReplyMarkup editMessageReplyMarkup = EditMessageReplyMarkup.builder()
                 .chatId(chatID)
                 .replyMarkup(kb)
-                .messageId(objectSend.getObjectId())
+                .messageId(Math.toIntExact(objectSend.getObjectId()))
                 .build();
         try {
 

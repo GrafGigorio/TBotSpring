@@ -21,7 +21,7 @@ public class ChartDAOimpl implements ChartDAO {
 
     @Override
     public Chart getActiveChart(Long userId) {
-        logger.info("<< getActiveChart userId " + userId);
+        logger.info("("+this.getClass().getSimpleName()+".java:"+new Throwable().getStackTrace()[0].getLineNumber()+")"+"<< getActiveChart userId " + userId);
         try{
             session = sessionFactory.openSession();
             session.beginTransaction();
@@ -39,8 +39,8 @@ public class ChartDAOimpl implements ChartDAO {
     }
 
     @Override
-    public Chart get(int chartId) {
-        logger.info("<< get chartId "+ chartId);
+    public Chart get(Long chartId) {
+        logger.info("("+this.getClass().getSimpleName()+".java:"+new Throwable().getStackTrace()[0].getLineNumber()+")"+"<< get chartId "+ chartId);
         try{
             session = sessionFactory.openSession();
             session.beginTransaction();
@@ -53,7 +53,7 @@ public class ChartDAOimpl implements ChartDAO {
 
     @Override
     public List<Chart> getClosedChartList(int userId) {
-        logger.info("<< getClosedChartList userId "+userId);
+        logger.info("("+this.getClass().getSimpleName()+".java:"+new Throwable().getStackTrace()[0].getLineNumber()+")"+"<< getClosedChartList userId "+userId);
         try{
             session = sessionFactory.openSession();
             session.beginTransaction();
@@ -72,7 +72,7 @@ public class ChartDAOimpl implements ChartDAO {
 
     @Override
     public Chart updateOrAdd(Chart chart) {
-        logger.info("<< updateOrAdd chart "+chart);
+        logger.info("("+this.getClass().getSimpleName()+".java:"+new Throwable().getStackTrace()[0].getLineNumber()+")"+"<< updateOrAdd chart "+chart);
         try{
             session = sessionFactory.openSession();
             session.beginTransaction();

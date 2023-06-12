@@ -30,7 +30,7 @@ public class MessageBot {
 
     public void execute()
     {
-        logger.info("<< execute " + update.getMessage().getText());
+        logger.info("("+this.getClass().getSimpleName()+".java:"+new Throwable().getStackTrace()[0].getLineNumber()+")"+"<< execute " + update.getMessage().getText());
         //Проверяем пользователя на наличие его в наших списках
         //getFrom(update);
 
@@ -53,7 +53,7 @@ public class MessageBot {
     }
     public Message sendMessage(String mes)
     {
-        logger.info("<< sendMessage mes " + mes);
+        logger.info("("+this.getClass().getSimpleName()+".java:"+new Throwable().getStackTrace()[0].getLineNumber()+")"+"<< sendMessage mes " + mes);
         SendMessage smd = SendMessage.builder().chatId(userBot.getTgId())
                 .text(mes).build();
         try {
@@ -64,7 +64,7 @@ public class MessageBot {
     }
     public Message sendMenu(SendMessage menu)
     {
-        logger.info("<< sendMenu menu " + menu.getText());
+        logger.info("("+this.getClass().getSimpleName()+".java:"+new Throwable().getStackTrace()[0].getLineNumber()+")"+"<< sendMenu menu " + menu.getText());
         try {
             return startBot.execute(menu);
         } catch (TelegramApiException e) {

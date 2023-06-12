@@ -39,7 +39,10 @@ public class Proxy {
 
     public void proxy(Update update)
     {
-        logger.info("<< proxy " + update.getCallbackQuery() != null ? update.getCallbackQuery() : update.getMessage());
+        String logd= "<< proxy " + (update.getCallbackQuery() != null ? update.getCallbackQuery() : update.getMessage());
+        if(logd.length() > 100)
+            logd = logd.substring(0,100) + " ...";
+        logger.info("("+this.getClass().getSimpleName()+".java:"+new Throwable().getStackTrace()[0].getLineNumber()+")"+logd);
         this.update = update;
         getFrom(update);//Сохраняем поле пользователя userBot и проверяем наличие обновлений полей
 
@@ -209,7 +212,7 @@ public class Proxy {
 
     private void getFrom(Update update)
     {
-        logger.info("<< getFrom " );
+        logger.info("("+this.getClass().getSimpleName()+".java:"+new Throwable().getStackTrace()[0].getLineNumber()+")"+"<< getFrom " );
         UserBot userBotTh = null;
         User user = null;
 
@@ -236,11 +239,11 @@ public class Proxy {
             userBotDAO.update(userBot2);
         }
         userBot = userBotTh;
-        logger.info("<< getFrom " + userBot.getFirstName() + " " + userBot.getLastName());
+        logger.info("("+this.getClass().getSimpleName()+".java:"+new Throwable().getStackTrace()[0].getLineNumber()+")"+"<< getFrom " + userBot.getFirstName() + " " + userBot.getLastName());
     }
 
     public Message sendMenu(Long who, String txt, InlineKeyboardMarkup kb) {
-        logger.info("<< sendMenu " + txt);
+        logger.info("("+this.getClass().getSimpleName()+".java:"+new Throwable().getStackTrace()[0].getLineNumber()+")<< sendMenu " + txt);
         SendMessage sm = SendMessage.builder().chatId(who.toString())
                 .parseMode("HTML").text(txt)
                 .replyMarkup(kb).build();

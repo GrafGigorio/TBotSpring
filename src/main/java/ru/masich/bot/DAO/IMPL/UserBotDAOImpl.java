@@ -28,7 +28,7 @@ public class UserBotDAOImpl implements UserBotDAO {
 
     @Override
     public List<UserBot> getAllUserBot() {
-        logger.info("<<  getAllUserBot");
+        logger.info("("+this.getClass().getSimpleName()+".java:"+new Throwable().getStackTrace()[0].getLineNumber()+")<< getAllUserBot");
         try (Session session = getSession()) {
 
             session.beginTransaction();
@@ -38,7 +38,7 @@ public class UserBotDAOImpl implements UserBotDAO {
 
     @Override
     public UserBot getUserBot(Long id) {
-        logger.info("<<  getUserBot Long " + id);
+        logger.info("("+this.getClass().getSimpleName()+".java:"+new Throwable().getStackTrace()[0].getLineNumber()+")<< getUserBot Long " + id);
         try (Session session = getSession()) {
             session.beginTransaction();
             return session.get(UserBot.class, id);
@@ -47,7 +47,7 @@ public class UserBotDAOImpl implements UserBotDAO {
 
     @Override
     public UserBot getUserBot(User user) {
-        logger.info("<<  getUserBot User " + user);
+        logger.info("("+this.getClass().getSimpleName()+".java:"+new Throwable().getStackTrace()[0].getLineNumber()+")<< getUserBot User " + user.toString().substring(0,200));
         try (Session session = getSession()) {
             session.beginTransaction();
             return session.byNaturalId(UserBot.class).using("tgId", user.getId()).load();
@@ -58,7 +58,7 @@ public class UserBotDAOImpl implements UserBotDAO {
 
     @Override
     public UserBot update(UserBot userBot) {
-        logger.info("<<  UserBot userBot " + userBot);
+        logger.info("("+this.getClass().getSimpleName()+".java:"+new Throwable().getStackTrace()[0].getLineNumber()+")<< UserBot userBot " + userBot);
         try (Session session = getSession()) {
             session.beginTransaction();
             session.update(userBot);
@@ -70,7 +70,7 @@ public class UserBotDAOImpl implements UserBotDAO {
 
     @Override
     public UserBot save(UserBot userBot) {
-        logger.info("<<  save userBot " + userBot);
+        logger.info("("+this.getClass().getSimpleName()+".java:"+new Throwable().getStackTrace()[0].getLineNumber()+")<< save userBot " + userBot);
         try (Session session = getSession()) {
             session.beginTransaction();
             session.save(userBot);
@@ -82,7 +82,7 @@ public class UserBotDAOImpl implements UserBotDAO {
 
     @Override
     public UserBot deleteUserBot(UserBot userBot) {
-        logger.info("<<  deleteUserBot userBot " + userBot);
+        logger.info("("+this.getClass().getSimpleName()+".java:"+new Throwable().getStackTrace()[0].getLineNumber()+")<< deleteUserBot userBot " + userBot);
         try (Session session = getSession()) {
             session.beginTransaction();
             session.delete(userBot);

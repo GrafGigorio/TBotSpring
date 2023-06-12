@@ -29,7 +29,7 @@ public class ProxyClient {
     }
 
     public void proxy() throws TelegramApiException {
-        logger.info("<< proxy");
+        logger.info("("+this.getClass().getSimpleName()+".java:"+new Throwable().getStackTrace()[0].getLineNumber()+")"+"<< proxy");
         //Предчек
         if(startBotUser.update.hasPreCheckoutQuery()) {
             getFrom(startBotUser.update.getPreCheckoutQuery().getFrom());
@@ -67,7 +67,7 @@ public class ProxyClient {
 
     private void getFrom(User user)
     {
-        logger.info("<< getFrom");
+        logger.info("("+this.getClass().getSimpleName()+".java:"+new Throwable().getStackTrace()[0].getLineNumber()+")"+"<< getFrom");
         UserBot userBotTh = userBotDAO.getUserBot(user);
         //Проверяем если пользователь в базе если есть проверяем изменились ли у него поля, если поменялись, тогда обновляем егов базе
         if(userBotTh == null)

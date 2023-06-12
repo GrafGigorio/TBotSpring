@@ -28,9 +28,9 @@ public class CatalogMenu {
     private static StoreDao storeDao = new StoreDAOimpl();
     private static UserBotDAO userBotDAO = new UserBotDAOImpl();
     static Logger logger = LogManager.getLogger(CatalogMenu.class);
-    public static SendMessage getStartMenu(UserBot userBot)
+    public static SendMessage getStartMenu(UserBot userBot)//"("+this.getClass().getSimpleName()+".java:"+new Throwable().getStackTrace()[0].getLineNumber()+")"+
     {
-        logger.info("<< getStartMenu");
+        logger.info("(CatalogMenu.java:"+new Throwable().getStackTrace()[0].getLineNumber()+")"+"<< getStartMenu");
         var newStore = InlineKeyboardButton.builder()
                 .text("Добавить новый магазин").callbackData(Var.createStore)
                 .build();
@@ -49,7 +49,7 @@ public class CatalogMenu {
     }
     public static InlineKeyboardMarkup getStartMenu(Long userBot)
     {
-        logger.info("<< getStartMenu");
+        logger.info("(CatalogMenu.java:"+new Throwable().getStackTrace()[0].getLineNumber()+")"+"<< getStartMenu");
         storeLines = new ArrayList<>();
         List<InlineKeyboardButton> lines = new ArrayList<>();
 
@@ -68,7 +68,7 @@ public class CatalogMenu {
                 .build();
     }
     public static InlineKeyboardMarkup getStoresList(UserBot userBot) {
-        logger.info("<< getStoresList");
+        logger.info("(CatalogMenu.java:"+new Throwable().getStackTrace()[0].getLineNumber()+")"+"<< getStoresList");
         List<Store> stores = storeDao.getAllUserStores(userBot.getId());
         storeLines = new ArrayList<>();
         for (Store store : stores) {
@@ -88,7 +88,7 @@ public class CatalogMenu {
                 .build();
     }
     public static InlineKeyboardMarkup getStoresList(Long userBotId) {
-        logger.info("<< getStoresList");
+        logger.info("(CatalogMenu.java:"+new Throwable().getStackTrace()[0].getLineNumber()+")"+"<< getStoresList");
 
         Map<String, Object> accesStores = userBotDAO.getUserBot(userBotId).getRole();
         storeLines = new ArrayList<>();
@@ -112,7 +112,7 @@ public class CatalogMenu {
                 .build();
     }
     public static InlineKeyboardMarkup getPermission(Long shopId) {
-        logger.info("<< getPermission");
+        logger.info("(CatalogMenu.java:"+new Throwable().getStackTrace()[0].getLineNumber()+")"+"<< getPermission");
 
         Map<String, Object> accesUsers = storeDao.getStore(shopId).getRole();
 
@@ -145,7 +145,7 @@ public class CatalogMenu {
 
     public static InlineKeyboardMarkup getStoreMenu(Store store,Long parant, Long catalog)
     {
-        logger.info("<< getStoreMenu");
+        logger.info("(CatalogMenu.java:"+new Throwable().getStackTrace()[0].getLineNumber()+")"+"<< getStoreMenu");
         storeLines = new ArrayList<>();
         storeLines.add(List.of(
                 InlineKeyboardButton
@@ -227,7 +227,7 @@ public class CatalogMenu {
 
     public static InlineKeyboardMarkup getCatalogMenu(Long shopId, Long parentId, Long catalogId,String title)
     {
-        logger.info("<<  getCatalogMenu");
+        logger.info("(CatalogMenu.java:"+new Throwable().getStackTrace()[0].getLineNumber()+")"+"<<  getCatalogMenu");
         //Если указан catalogId то это каталог нижнего уровня в котором должны быть только товары
         //Если указан parentId то это родительский каталог других каталогов
         //Если указан только shopId то это список каталога верхнего уровня

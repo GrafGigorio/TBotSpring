@@ -36,7 +36,7 @@ public class MenuClient {
     static Logger logger = LogManager.getLogger(MenuClient.class);
 
     public static void sendStartMenu(UserBot userBot,String title, int shopID) throws TelegramApiException {
-        logger.info("<<  sendStartMenu");
+        logger.info("MenuClient.java:"+new Throwable().getStackTrace()[0].getLineNumber()+")"+"<<  sendStartMenu");
         //Приветствие
         ClientMessage.proxyClient.startBotUser.execute(
                 SendMessage.builder().chatId(userBot.getTgId()).text(title).build());
@@ -45,7 +45,7 @@ public class MenuClient {
         sendCatalogs(userBot.getTgId(),catalogs);
     }
     public static void sendCatalogs(Long chat_id, List<Catalog> catalogs) throws TelegramApiException {
-        logger.info("<<  sendCatalogs");
+        logger.info("MenuClient.java:"+new Throwable().getStackTrace()[0].getLineNumber()+")"+"<<  sendCatalogs");
         for (Catalog catalog : catalogs)
         {
             Map<String, Object> params = catalog.getCatalog_atributes();
@@ -71,7 +71,7 @@ public class MenuClient {
         }
     }
     public static void sendProducts(Long chat_id, List<Product> products) {
-        logger.info("<<  sendProducts");
+        logger.info("MenuClient.java:"+new Throwable().getStackTrace()[0].getLineNumber()+")"+"<<  sendProducts");
         for (Product product : products)
         {
             //Создалем и сохраняем объект в базе для дальнейшей ссылки на него
@@ -85,9 +85,9 @@ public class MenuClient {
             objectSendDAO.updateObject(objectSend);
         }
     }
-    public static int sendProduct(Product product, Long chat_id, Long objectId)
+    public static Long sendProduct(Product product, Long chat_id, Long objectId)
     {
-        logger.info("<<  sendProduct");
+        logger.info("MenuClient.java:"+new Throwable().getStackTrace()[0].getLineNumber()+")"+"<<  sendProduct");
         Map<String, Object> params = product.getProductAttributes();
 
         List<InlineKeyboardButton> count = new ArrayList<>();
@@ -156,7 +156,7 @@ public class MenuClient {
                 .build();
         try {
             ClientButton.proxyClient.startBotUser.update.getCallbackQuery();
-            return ClientButton.proxyClient.startBotUser.execute(sendPhoto).getMessageId();
+            return Long.valueOf(ClientButton.proxyClient.startBotUser.execute(sendPhoto).getMessageId());
         } catch (TelegramApiException e) {
             throw new RuntimeException(e);
         }

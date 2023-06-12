@@ -28,7 +28,7 @@ public class ClientMessage {
         String mes = proxyClient.startBotUser.update.getMessage().getText();
         String retMes="123";
 
-        logger.info("<< execute mes " + mes);
+        logger.info("(ClientMessage"+".java:"+new Throwable().getStackTrace()[0].getLineNumber()+")"+"<< execute mes " + mes);
         if(mes == null)
         {
             System.out.println("=============");
@@ -47,12 +47,13 @@ public class ClientMessage {
         if(mes.equals("/chart"))
         {
             retMes = proxyClient.userBot.getFirstName()+", вот ваша корзина:";
-            ChartMenu.sendActiveChart(proxyClient.userBot, retMes);
+            ChartMenu chartMenu = new ChartMenu();
+            chartMenu.sendActiveChartNew(proxyClient.startBotUser, retMes);
         }
     }
     static public Message sendMessage(String mes)
     {
-        logger.info("<<  sendMessage");
+        logger.info("(ClientMessage"+".java:"+new Throwable().getStackTrace()[0].getLineNumber()+")"+"<<  sendMessage");
         List<BotCommand> commands = new ArrayList<>();
         commands.add(new BotCommand("start", "Начало"));
         commands.add(new BotCommand("catalog", "Каталог"));

@@ -23,7 +23,7 @@ public class StoreDAOimpl implements StoreDao {
     @Override
     public List<Store> getAllStore() {
         //Session session = sessionFactory.getCurrentSession();
-        logger.info("<< getAllStore");
+        logger.info("("+this.getClass().getSimpleName()+".java:"+new Throwable().getStackTrace()[0].getLineNumber()+")"+"<< getAllStore");
         try {
             session = sessionFactory.openSession();
             session.beginTransaction();
@@ -35,7 +35,7 @@ public class StoreDAOimpl implements StoreDao {
 
     @Override
     public List<Store> getAllUserStores(Long userId) {
-        logger.info("<< getAllUserStores userId " + userId);
+        logger.info("("+this.getClass().getSimpleName()+".java:"+new Throwable().getStackTrace()[0].getLineNumber()+")"+"<< getAllUserStores userId " + userId);
         //Session session = sessionFactory.getCurrentSession();
         try {
             session = sessionFactory.openSession();
@@ -48,7 +48,7 @@ public class StoreDAOimpl implements StoreDao {
 
     @Override
     public Store getStore(Long storeId) {
-        logger.info("<< getStore storeId " + storeId);
+        logger.info("("+this.getClass().getSimpleName()+".java:"+new Throwable().getStackTrace()[0].getLineNumber()+")"+"<< getStore storeId " + storeId);
         //Session session = sessionFactory.getCurrentSession();
         try {
             session = sessionFactory.openSession();
@@ -61,7 +61,7 @@ public class StoreDAOimpl implements StoreDao {
 
     @Override
     public Store saveOrUpdateStore(Store store) {
-        logger.info("<<  saveOrUpdateStore store " + store);
+        logger.info("("+this.getClass().getSimpleName()+".java:"+new Throwable().getStackTrace()[0].getLineNumber()+")"+"<<  saveOrUpdateStore store " + store);
         //Session session = sessionFactory.getCurrentSession();
         try {
             session = sessionFactory.openSession();
@@ -76,7 +76,7 @@ public class StoreDAOimpl implements StoreDao {
 
     @Override
     public Store deleteStore(Store store) {
-        logger.info("<< deleteStore store " + store);
+        logger.info("("+this.getClass().getSimpleName()+".java:"+new Throwable().getStackTrace()[0].getLineNumber()+")"+"<< deleteStore store " + store);
         //Session session = sessionFactory.getCurrentSession();
         try {
             session = sessionFactory.openSession();

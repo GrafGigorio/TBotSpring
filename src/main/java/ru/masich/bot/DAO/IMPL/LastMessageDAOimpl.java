@@ -29,7 +29,7 @@ public class LastMessageDAOimpl implements LastMessageDAO {
 
     @Override
     public LastMessage getLastMessage(Long userId) {
-        logger.info("<<  getLastMessage userId " + userId);
+        logger.info("("+this.getClass().getSimpleName()+".java:"+new Throwable().getStackTrace()[0].getLineNumber()+")"+"<<  getLastMessage userId " + userId);
         try {
             session = session.isOpen() ? session : sessionFactory.openSession();
             session.beginTransaction();
@@ -56,7 +56,7 @@ public class LastMessageDAOimpl implements LastMessageDAO {
 
     @Override
     public void setLastMessage(LastMessage lastMessage) {
-        logger.info("<<  setLastMessage lastMessage " + lastMessage);
+        logger.info("("+this.getClass().getSimpleName()+".java:"+new Throwable().getStackTrace()[0].getLineNumber()+")"+"<<  setLastMessage lastMessage " + lastMessage);
         try {
             session = sessionFactory.openSession();
             session.beginTransaction();
@@ -70,7 +70,7 @@ public class LastMessageDAOimpl implements LastMessageDAO {
 
     @Override
     public void updateLastMessage(LastMessage lastMessage) {
-        logger.info("<<  updateLastMessage lastMessage " + lastMessage);
+        logger.info("("+this.getClass().getSimpleName()+".java:"+new Throwable().getStackTrace()[0].getLineNumber()+")"+"<<  updateLastMessage lastMessage " + lastMessage);
         //Session session = sessionFactory.getCurrentSession();
         try {
             session = sessionFactory.openSession();
@@ -91,7 +91,7 @@ public class LastMessageDAOimpl implements LastMessageDAO {
 
     @Override
     public void deleteLastMessage(LastMessage lastMessage) {
-        logger.info("<<  deleteLastMessage lastMessage " + lastMessage);
+        logger.info("("+this.getClass().getSimpleName()+".java:"+new Throwable().getStackTrace()[0].getLineNumber()+")"+"<<  deleteLastMessage lastMessage " + lastMessage);
         //Session session = sessionFactory.getCurrentSession();
         try {
             session.beginTransaction();

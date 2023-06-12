@@ -22,7 +22,7 @@ public class ProductDAOimpl implements ProductDAO {
 
     @Override
     public Product get(int productId) {
-        logger.info("<<  get productId " + productId);
+        logger.info("("+this.getClass().getSimpleName()+".java:"+new Throwable().getStackTrace()[0].getLineNumber()+")"+"<<  get productId " + productId);
         try {
             session = sessionFactory.openSession();
             session.beginTransaction();
@@ -34,7 +34,7 @@ public class ProductDAOimpl implements ProductDAO {
 
     @Override
     public List<Product> getStore(Long store) {
-        logger.info("<<  getStore store " + store);
+        logger.info("("+this.getClass().getSimpleName()+".java:"+new Throwable().getStackTrace()[0].getLineNumber()+")"+"<<  getStore store " + store);
         try {
             session = sessionFactory.openSession();
             session.beginTransaction();
@@ -46,7 +46,7 @@ public class ProductDAOimpl implements ProductDAO {
 
     @Override
     public List<Product> getCatalog(Long catalogID) {
-        logger.info("<<  getCatalog catalogID " + catalogID);
+        logger.info("("+this.getClass().getSimpleName()+".java:"+new Throwable().getStackTrace()[0].getLineNumber()+")"+"<<  getCatalog catalogID " + catalogID);
         try {
             session = sessionFactory.openSession();
             session.beginTransaction();
@@ -58,7 +58,7 @@ public class ProductDAOimpl implements ProductDAO {
 
     @Override
     public void set(Product product) {
-        logger.info("<<  set product " + product);
+        logger.info("("+this.getClass().getSimpleName()+".java:"+new Throwable().getStackTrace()[0].getLineNumber()+")"+"<<  set product " + product);
         try {
             session = sessionFactory.openSession();
             session.beginTransaction();
@@ -71,7 +71,7 @@ public class ProductDAOimpl implements ProductDAO {
 
     @Override
     public void delete(int productId) {
-        logger.info("<<  delete productId " + productId);
+        logger.info("("+this.getClass().getSimpleName()+".java:"+new Throwable().getStackTrace()[0].getLineNumber()+")"+"<<  delete productId " + productId);
         try {
             session = sessionFactory.openSession();
             session.beginTransaction();

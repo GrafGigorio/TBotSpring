@@ -19,12 +19,26 @@ public class ObjectSendDAOimpl implements ObjectSendDAO {
     }
 
     @Override
-    public ObjectSend getObject(Long objectId) {
-        logger.info("<<  getObject objectId " + objectId);
+    public ObjectSend get(Long id) {
+        logger.info("("+this.getClass().getSimpleName()+".java:"+new Throwable().getStackTrace()[0].getLineNumber()+")"+"<<  get id " + id);
         try {
             session = sessionFactory.openSession();
             session.beginTransaction();
-            return session.get(ObjectSend.class, objectId);
+            return session.get(ObjectSend.class, id);
+        }
+        finally {
+            session.close();
+        }
+    }
+
+    @Override
+    public ObjectSend getObject(Long objectId) {
+        logger.info("("+this.getClass().getSimpleName()+".java:"+new Throwable().getStackTrace()[0].getLineNumber()+")"+"<<  getObject objectId " + objectId);
+        try {
+            session = sessionFactory.openSession();
+            session.beginTransaction();
+                         session = sessionFactory.openSession();
+            return session.createQuery("from ObjectSend where objectId="+objectId, ObjectSend.class).getSingleResult();
         }
         finally {
             session.close();
@@ -33,7 +47,7 @@ public class ObjectSendDAOimpl implements ObjectSendDAO {
 
     @Override
     public ObjectSend updateObject(ObjectSend object) {
-        logger.info("<<  updateObject object " + object);
+        logger.info("("+this.getClass().getSimpleName()+".java:"+new Throwable().getStackTrace()[0].getLineNumber()+")"+"<<  updateObject object " + object);
         try {
             session = sessionFactory.openSession();
             session.beginTransaction();
@@ -48,7 +62,7 @@ public class ObjectSendDAOimpl implements ObjectSendDAO {
 
     @Override
     public ObjectSend deleteObject(Long objectId) {
-        logger.info("<<  deleteObject objectId " + objectId);
+        logger.info("("+this.getClass().getSimpleName()+".java:"+new Throwable().getStackTrace()[0].getLineNumber()+")"+"<<  deleteObject objectId " + objectId);
         ObjectSend o = null;
         try {
             session = sessionFactory.openSession();
@@ -62,4 +76,5 @@ public class ObjectSendDAOimpl implements ObjectSendDAO {
         }
         return o;
     }
+
 }

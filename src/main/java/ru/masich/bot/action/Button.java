@@ -40,7 +40,7 @@ public class Button {
 
     public void execute(Update update)
     {
-        logger.info("<< execute " + update.getCallbackQuery().getData());
+        logger.info("("+this.getClass().getSimpleName()+".java:"+new Throwable().getStackTrace()[0].getLineNumber()+")"+"<< execute " + update.getCallbackQuery().getData());
         UserBot userBot = userBotDAO.getUserBot(update.getCallbackQuery().getFrom());
         CatalogDAO catalogDAO = new CatalogDAOimpl();
 
@@ -96,7 +96,7 @@ public class Button {
                 Map<String, Object> roles = userBot.getRole();
                 roles.remove(String.valueOf(store.getId()));
                 userBotDAO.update(userBot);
-                storeDao.deleteStore(store);d
+                storeDao.deleteStore(store);
                 editMessage(chatId,callbackId,"Магазин #"+store.getId() +" "+store.getTitle() + " удален!", msgId);
                 Message message = sendMenu(userBot.getTgId(),Var.getStoresTitle, CatalogMenu.getStoresList(userBot.getId()));
                 lastMessage.setLastMessageId(message.getMessageId());
@@ -197,7 +197,7 @@ public class Button {
     }
 
     private void editMessage(Long chatId, String queryId, String data, int msgId) {
-        logger.info("<< editMessage " + data);
+        logger.info("("+this.getClass().getSimpleName()+".java:"+new Throwable().getStackTrace()[0].getLineNumber()+")"+"<< editMessage " + data);
         EditMessageText newTxt = EditMessageText.builder()
                 .chatId(chatId.toString())
                 .messageId(msgId).text(data).build();
@@ -218,7 +218,7 @@ public class Button {
     }
     private void editMessage(Long chatId, String queryId, String title, int msgId, InlineKeyboardMarkup menu) {
         //--msgId;
-        logger.info("<< editMessage 2");
+        logger.info("("+this.getClass().getSimpleName()+".java:"+new Throwable().getStackTrace()[0].getLineNumber()+")"+"<< editMessage 2");
         EditMessageText newTxt = EditMessageText.builder()
                 .chatId(chatId.toString())
                 .messageId(msgId).text(title).build();
@@ -239,7 +239,7 @@ public class Button {
         }
     }
     public Message sendMenu(Long who, String txt, InlineKeyboardMarkup kb) {
-        logger.info("<< sendMenu txt");
+        logger.info("("+this.getClass().getSimpleName()+".java:"+new Throwable().getStackTrace()[0].getLineNumber()+")"+"<< sendMenu txt");
         SendMessage sm = SendMessage.builder().chatId(who.toString())
                 .parseMode("HTML").text(txt)
                 .replyMarkup(kb).build();

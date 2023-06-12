@@ -18,7 +18,7 @@ public class BigObjectimpl implements BigObjectDAO {
     }
     @Override
     public BIgObject get(int id) {
-        logger.info("<< get id" + id);
+        logger.info("("+this.getClass().getSimpleName()+".java:"+new Throwable().getStackTrace()[0].getLineNumber()+")"+"<< get id " + id);
         try {
             session = sessionFactory.openSession();
             session.beginTransaction();
@@ -30,6 +30,7 @@ public class BigObjectimpl implements BigObjectDAO {
 
     @Override
     public void save(int userId, String data) {
+        logger.info("("+this.getClass().getSimpleName()+".java:"+new Throwable().getStackTrace()[0].getLineNumber()+")"+"<< save userId " + userId);
         try {
             session = sessionFactory.openSession();
             session.beginTransaction();
@@ -42,6 +43,7 @@ public class BigObjectimpl implements BigObjectDAO {
 
     @Override
     public void save(BIgObject object) {
+        logger.info("("+this.getClass().getSimpleName()+".java:"+new Throwable().getStackTrace()[0].getLineNumber()+")"+"<< save object " + object);
         try {
             session = sessionFactory.openSession();
             session.beginTransaction();

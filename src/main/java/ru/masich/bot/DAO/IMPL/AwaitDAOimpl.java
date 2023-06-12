@@ -23,7 +23,7 @@ public class AwaitDAOimpl implements AwaitDao {
 
     @Override
     public Await saveOrUpdate(Await await) {
-        logger.info("<<  saveOrUpdate await "+ await);
+        logger.info("("+this.getClass().getSimpleName()+".java:"+new Throwable().getStackTrace()[0].getLineNumber()+")"+"<<  saveOrUpdate await "+ await);
         //Session session = sessionFactory.getCurrentSession();
         try {
             session.beginTransaction();
@@ -38,7 +38,7 @@ public class AwaitDAOimpl implements AwaitDao {
     @Override
     public Await set(Await await) {
         //Session session = sessionFactory.getCurrentSession();
-        logger.info("<<  set await " + await);
+        logger.info("("+this.getClass().getSimpleName()+".java:"+new Throwable().getStackTrace()[0].getLineNumber()+")"+"<<  set await " + await);
         try {
             session.beginTransaction();
             session.save(await);
@@ -52,7 +52,7 @@ public class AwaitDAOimpl implements AwaitDao {
 
     @Override
     public Await get(Long userid) {
-        logger.info("<<  get userid " + userid);
+        logger.info("("+this.getClass().getSimpleName()+".java:"+new Throwable().getStackTrace()[0].getLineNumber()+")"+"<<  get userid " + userid);
         try {
             session.beginTransaction();
             return session.createQuery("from Await where userid="+userid, Await.class).getSingleResult();
@@ -68,7 +68,7 @@ public class AwaitDAOimpl implements AwaitDao {
     }
     @Override
     public List<Await> getAll(Long userid) {
-        logger.info("<<  getAll Await userid " + userid);
+        logger.info("("+this.getClass().getSimpleName()+".java:"+new Throwable().getStackTrace()[0].getLineNumber()+")"+"<<  getAll Await userid " + userid);
         //Session session = sessionFactory.getCurrentSession();
         try {
             //session.beginTransaction();
@@ -82,7 +82,7 @@ public class AwaitDAOimpl implements AwaitDao {
 
     @Override
     public Await delete(Await await) {
-        logger.info("<<  delete");
+        logger.info("("+this.getClass().getSimpleName()+".java:"+new Throwable().getStackTrace()[0].getLineNumber()+")"+"<<  delete");
         //Session session = sessionFactory.getCurrentSession();
         try {
             session = sessionFactory.openSession();
