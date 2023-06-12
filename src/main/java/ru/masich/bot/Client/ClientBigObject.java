@@ -6,15 +6,14 @@ import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import ru.masich.bot.DAO.IMPL.BigObjectimpl;
 import ru.masich.bot.DAO.IMPL.ChartDAOimpl;
 import ru.masich.bot.DAO.IMPL.ObjectSendDAOimpl;
-import ru.masich.bot.DAO.IMPL.UserBotDAOImpl;
 import ru.masich.bot.DAO.interfaces.BigObjectDAO;
 import ru.masich.bot.DAO.interfaces.ChartDAO;
 import ru.masich.bot.DAO.interfaces.ObjectSendDAO;
-import ru.masich.bot.DAO.interfaces.UserBotDAO;
 import ru.masich.bot.ProxyClient;
 import ru.masich.bot.entity.BIgObject;
 import ru.masich.bot.entity.Chart;
 import ru.masich.bot.entity.HashMapConverter;
+import ru.masich.bot.entity.ObjectSend;
 import ru.masich.bot.menu.ChartMenu;
 
 import java.util.List;
@@ -27,7 +26,6 @@ public class ClientBigObject {
     static Logger logger = LoggerFactory.getLogger(ClientBigObject.class);
     private static final ObjectSendDAO objectSendDAO = new ObjectSendDAOimpl();
     private static final ChartDAO chartDAO = new ChartDAOimpl();
-    private static final UserBotDAO userBotDAO = new UserBotDAOImpl();
 
     public static void process(ProxyClient proxyClient){
         CallbackQuery callbackQuery = proxyClient.startBotUser.update.getCallbackQuery();
@@ -39,7 +37,8 @@ public class ClientBigObject {
         String bigObjectID = (String) convert.convertToEntityAttribute(callbackQuery.getData()).get("bigObj");
         BIgObject bIgObject = bigObjectDAO.get(Integer.parseInt(bigObjectID));
 
-        Long objId = objectSendDAO.get(Long.valueOf(bIgObject.getData().get("objId").toString())).getId();
+        ObjectSend objectSend = objectSendDAO.get(Long.valueOf(bIgObject.getData().get("objId").toString()));
+        Long objId = objectSend.getId();
 
         //Удаление товара из корзины
         if(bIgObject.getData().get("act").equals("chartPrDel")){
@@ -59,13 +58,10 @@ public class ClientBigObject {
             {
                 int productIDChart = (int) x.get("productId");
                 int selIDChart = (int) x.get("selId");
-                if(productIDChart == productId && selIDChart == productSelect) {
-                    return true;
-                }
-                return false;
+                return productIDChart == productId && selIDChart == productSelect;
             });
             chartDAO.updateOrAdd(chart);
-            new ChartMenu().sendActiveChartEdit(proxyClient.startBotUser, objId);
+            new ChartMenu().edit(proxyClient.startBotUser, objectSend);
         }
 
         if(bIgObject.getData().get("act").equals("chartSave")){

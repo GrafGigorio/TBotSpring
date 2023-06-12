@@ -35,11 +35,9 @@ import java.util.Map;
 public class ChartMenu {
     private final ChartDAO chartDAO = new ChartDAOimpl();
     private final ProductDAO productDAO = new ProductDAOimpl();
-    private final BigObjectDAO bigObjectDAO = new BigObjectimpl();
     private final ObjectSendDAO objectSendDAO = new ObjectSendDAOimpl();
      Logger logger = LogManager.getLogger(ChartMenu.class);
     private StringBuilder stringBuilder = new StringBuilder();
-    Long objId = 0L;
     Long chatID = 0L;
     Long prepareObject = 0L;
     InlineKeyboardMarkup kb = new InlineKeyboardMarkup();
@@ -48,11 +46,8 @@ public class ChartMenu {
         updateVars(userBot,true);
         logger.info("("+this.getClass().getSimpleName()+".java:"+new Throwable().getStackTrace()[0].getLineNumber()+")"+"<< sendActiveChartNew");
 
-
         //Приветствие
-
-
-        int message = 0;
+        int message = -1;
         try {
             ClientMessage.proxyClient.startBotUser.execute(
                     SendMessage.builder()
@@ -109,7 +104,6 @@ public class ChartMenu {
     private void updateVars(StartBotUser userBot)
     {
         logger.info("(ChartMenu.java:"+new Throwable().getStackTrace()[0].getLineNumber()+")"+"<< sendActiveChart");
-
 
         if(userBot.update.hasCallbackQuery())
             chatID = userBot.update.getCallbackQuery().getFrom().getId();
@@ -185,13 +179,19 @@ public class ChartMenu {
         {
             List<InlineKeyboardButton> butLine = new ArrayList<>();
             Product product = productDAO.get((Integer) elem.get("productId"));
+
+            int selID = (int) elem.get("selId");
+            Map<String, Object> checkBox = (Map<String, Object>) product.getProductAttributes().get("check_box_prop");
+            Map<String, Object> selected = (Map<String, Object>) checkBox.get(selID+"");
+            String tit = (String) selected.get("tit");
+
             lines.add(List.of(InlineKeyboardButton.builder()
-                    .text((String) product.getProductAttributes().get("title"))
+                    .text(product.getProductAttributes().get("title") +" : " + tit + " : " + elem.get("count") + product.getProductAttributes().get("measurement"))
                     .callbackData("123")
                     .build()));
 
             butLine.add(InlineKeyboardButton.builder()
-                    .text("✏\uFE0F Изменить ✏\uFE0F")
+                    .text("✏️ Изменить ✏️")
                     .callbackData("123")
                     .build());
 
