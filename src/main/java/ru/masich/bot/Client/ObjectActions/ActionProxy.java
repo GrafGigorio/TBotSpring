@@ -73,9 +73,15 @@ public class ActionProxy {
             int count = objectSendProp.get("count") != null ?
                     (int) objectSendProp.get("count") :
                     jsonObject.getInt("cou");
-
             count += jsonObject.getInt("cou");
+            //Добавляем свойство если оно есть затираем
             objectSendProp.put("count", count);
+
+            //Если пустое свойство размера
+            if(objectSendProp.get("objectSendProp") == null) {
+                Map<String, Map<String, Object>> check_box_prop = (Map<String, Map<String, Object>>) product.getProductAttributes().get("check_box_prop");
+                objectSendProp.put("check_box_prop", check_box_prop);
+            }
 
             objectSendDAO.updateObject(objectSend);
             editMessageProductObj(product,objectSend);
@@ -91,7 +97,25 @@ public class ActionProxy {
                     jsonObject.getInt("cou");
 
             count -= jsonObject.getInt("cou");
+            if(count < 0)
+            {
+                try {
+                    proxyClient.startBotUser.execute(AnswerCallbackQuery.builder()
+                            .callbackQueryId(proxyClient.startBotUser.update.getCallbackQuery().getId())
+                            .text("Результат "+count+" Мы к сожанению только продаем товар не покупаем))")
+                            .build());
+                } catch (TelegramApiException e) {
+                    throw new RuntimeException(e);
+                }
+                return;
+            }
             objectSendProp.put("count", count);
+
+            //Если пустое свойство размера
+            if(objectSendProp.get("objectSendProp") == null) {
+                Map<String, Map<String, Object>> check_box_prop = (Map<String, Map<String, Object>>) product.getProductAttributes().get("check_box_prop");
+                objectSendProp.put("check_box_prop", check_box_prop);
+            }
 
             objectSendDAO.updateObject(objectSend);
             editMessageProductObj(product,objectSend);

@@ -36,7 +36,7 @@ public class MenuClient {
     static Logger logger = LogManager.getLogger(MenuClient.class);
 
     public static void sendStartMenu(UserBot userBot,String title, int shopID) throws TelegramApiException {
-        logger.info("MenuClient.java:"+new Throwable().getStackTrace()[0].getLineNumber()+")"+"<<  sendStartMenu");
+        logger.info("(MenuClient.java:"+new Throwable().getStackTrace()[0].getLineNumber()+")"+"<<  sendStartMenu");
         //Приветствие
         ClientMessage.proxyClient.startBotUser.execute(
                 SendMessage.builder().chatId(userBot.getTgId()).text(title).build());
@@ -45,7 +45,7 @@ public class MenuClient {
         sendCatalogs(userBot.getTgId(),catalogs);
     }
     public static void sendCatalogs(Long chat_id, List<Catalog> catalogs) throws TelegramApiException {
-        logger.info("MenuClient.java:"+new Throwable().getStackTrace()[0].getLineNumber()+")"+"<<  sendCatalogs");
+        logger.info("(MenuClient.java:"+new Throwable().getStackTrace()[0].getLineNumber()+")"+"<<  sendCatalogs");
         for (Catalog catalog : catalogs)
         {
             Map<String, Object> params = catalog.getCatalog_atributes();
@@ -71,7 +71,7 @@ public class MenuClient {
         }
     }
     public static void sendProducts(Long chat_id, List<Product> products) {
-        logger.info("MenuClient.java:"+new Throwable().getStackTrace()[0].getLineNumber()+")"+"<<  sendProducts");
+        logger.info("(MenuClient.java:"+new Throwable().getStackTrace()[0].getLineNumber()+")"+"<<  sendProducts");
         for (Product product : products)
         {
             //Создалем и сохраняем объект в базе для дальнейшей ссылки на него
@@ -87,7 +87,7 @@ public class MenuClient {
     }
     public static Long sendProduct(Product product, Long chat_id, Long objectId)
     {
-        logger.info("MenuClient.java:"+new Throwable().getStackTrace()[0].getLineNumber()+")"+"<<  sendProduct");
+        logger.info("(MenuClient.java:"+new Throwable().getStackTrace()[0].getLineNumber()+")"+"<<  sendProduct");
         Map<String, Object> params = product.getProductAttributes();
 
         List<InlineKeyboardButton> count = new ArrayList<>();
@@ -111,23 +111,18 @@ public class MenuClient {
         Map<String, Map<String, Object>> size = (Map<String, Map<String, Object>>) params.get("check_box_prop");
 
         InlineKeyboardMarkup kb = new InlineKeyboardMarkup();
-       //List<List<InlineKeyboardButton>> lines = new ArrayList<>();
 
         List<List<InlineKeyboardButton>> lines = new ArrayList<>(CheckBox.check(params, String.valueOf(objectId)));
 
         lines.add(count);
 
-        StringBuilder title = new StringBuilder();
-//        Object sizeTitle = (size) .removeIf(x -> {
-//            if (x.get("sel") != null)
-//                title.append(x.get("tit"));
-//            return false;
-//        });
+        String title = "";
+
         for (Map.Entry<String, Map<String, Object>> szdd : size.entrySet())
         {
             Map<String, Object> x = szdd.getValue();
             if (x.get("sel") != null)
-                title.append(x.get("tit"));
+                title = String.valueOf(x.get("tit"));
         }
         Object cuont = dsd.get("1").get("cou");
 
