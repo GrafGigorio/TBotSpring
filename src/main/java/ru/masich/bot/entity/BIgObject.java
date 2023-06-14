@@ -52,4 +52,13 @@ public class BIgObject {
     public void setData(Map<String, Object> data) {
         this.data = data;
     }
+
+    @Override
+    public String toString() {
+        return "BIgObject{" +
+                "id=" + id +
+                ", userId=" + userId +
+                ", data=" + data +
+                '}';
+    }
 }

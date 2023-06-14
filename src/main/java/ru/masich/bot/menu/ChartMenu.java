@@ -7,6 +7,7 @@ import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageReplyMarkup;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
+import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
@@ -42,30 +43,32 @@ public class ChartMenu {
     Long prepareObject = 0L;
     InlineKeyboardMarkup kb = new InlineKeyboardMarkup();
     //send new
-    public void sendActiveChartNew(StartBotUser userBot, String title)  {
+    public Message sendActiveChartNew(StartBotUser userBot, String title)  {
         updateVars(userBot,true);
         logger.info("("+this.getClass().getSimpleName()+".java:"+new Throwable().getStackTrace()[0].getLineNumber()+")"+"<< sendActiveChartNew");
 
         //Приветствие
-        int message = -1;
+        Message message = null;
         try {
-            ClientMessage.proxyClient.startBotUser.execute(
-                    SendMessage.builder()
-                            .chatId(chatID)
-                            .text(title)
-                            .build());
+            if(title != "") {
+                ClientMessage.proxyClient.startBotUser.execute(
+                        SendMessage.builder()
+                                .chatId(chatID)
+                                .text(title)
+                                .build());
+            }
             message = userBot.execute(
                     SendMessage.builder()
                             .chatId(chatID)
                             .text(stringBuilder.toString())
                             .replyMarkup(kb)
-                            .build()).getMessageId();
+                            .build());
         } catch (TelegramApiException e) {
             throw new RuntimeException(e);
         }
 
-        ObjectSave.save(prepareObject, chatID, (long) message);
-
+        ObjectSave.save(prepareObject, chatID, (long) message.getMessageId());
+        return message;
     }
     //edit
     public void sendActiveChartEdit(StartBotUser userBot, Long updateObject) {
@@ -160,7 +163,7 @@ public class ChartMenu {
     }
     public void edit(StartBotUser startBotUser, ObjectSend objectSend)
     {
-        logger.info("<< edit " + objectSend);
+        logger.info("("+this.getClass().getSimpleName()+".java:"+new Throwable().getStackTrace()[0].getLineNumber()+")<< edit " + objectSend);
 
         BigObjectDAO bigObjectDAO = new BigObjectimpl();
         ChartDAO chartDAO = new ChartDAOimpl();
@@ -190,9 +193,21 @@ public class ChartMenu {
                     .callbackData("123")
                     .build()));
 
+
+
+            Map<String, Object> chartProductEdit = new LinkedHashMap<>();
+            chartProductEdit.put("objId",objectSend.getId()+"");
+            chartProductEdit.put("act","chartProductEdit");
+            chartProductEdit.put("productId",product.getId());
+            chartProductEdit.put("productSelect",selID);
+            chartProductEdit.put("chartID",chart.getId());
+
+            BIgObject productEdit = new BIgObject(Math.toIntExact(chart.getUser_id()), chartProductEdit);
+            bigObjectDAO.save(productEdit);
+
             butLine.add(InlineKeyboardButton.builder()
                     .text("✏️ Изменить ✏️")
-                    .callbackData("123")
+                    .callbackData("{\"bigObj\":\""+productEdit.getId()+"\"}")
                     .build());
 
             Map<String, Object> dellDta = new LinkedHashMap<>();
@@ -238,6 +253,7 @@ public class ChartMenu {
                 .text("Редактирование корзины")
                 .build();
         try {
+
             startBotUser.execute(editMessageText);
             startBotUser.execute(editMessageReplyMarkup);
 

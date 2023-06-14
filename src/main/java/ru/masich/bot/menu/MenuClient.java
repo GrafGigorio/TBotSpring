@@ -5,7 +5,9 @@ import org.apache.logging.log4j.Logger;
 import org.json.JSONObject;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
 import org.telegram.telegrambots.meta.api.objects.InputFile;
+import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
@@ -152,6 +154,90 @@ public class MenuClient {
         try {
             ClientButton.proxyClient.startBotUser.update.getCallbackQuery();
             return Long.valueOf(ClientButton.proxyClient.startBotUser.execute(sendPhoto).getMessageId());
+        } catch (TelegramApiException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    public static Long sendProductChart(Product product, Long chat_id, Long objectId, Map<String,Object> chart)
+    {
+        logger.info("(MenuClient.java:"+new Throwable().getStackTrace()[0].getLineNumber()+")"+"<<  sendProductСhart");
+        Map<String, Object> params = product.getProductAttributes();
+
+        List<InlineKeyboardButton> count = new ArrayList<>();
+
+        //Создалем и сохраняем объект в базе для дальнейшей ссылки на него
+        ObjectSendDAO objectSendDAO = new ObjectSendDAOimpl();
+        ObjectSend objectSend = new ObjectSend(chat_id);
+        objectSend.setProperty(Map.of("productId",product.getId(),"chart",chart));
+        objectSendDAO.updateObject(objectSend);
+
+        Map<String, Map<String,String>> dsd = (Map<String, Map<String, String>>) params.get("count_property");
+        //Свойства по количеству
+        for (Map.Entry<String, Map<String,String>>  countProp : dsd.entrySet())
+        {
+            Map<String,String> dasdwd= countProp.getValue();
+            dasdwd.put("objId",objectSend.getId()+"");
+            dasdwd.put("chart","");
+            String title = dasdwd.get("tit");
+            dasdwd.remove("tit");
+            String dasd = new JSONObject(dasdwd).toString();
+            count.add(InlineKeyboardButton.builder()
+                    .text(title)
+                    .callbackData(dasd)
+                    .build());
+            System.out.println(count);
+        }
+        //Свойства по размеру
+        Map<String, Map<String, Object>> size = (Map<String, Map<String, Object>>) params.get("check_box_prop");
+
+        InlineKeyboardMarkup kb = new InlineKeyboardMarkup();
+
+        List<List<InlineKeyboardButton>> lines = new ArrayList<>(CheckBox.check(params, String.valueOf(objectSend.getId())));
+
+        lines.add(count);
+
+        String title = "";
+
+        for (Map.Entry<String, Map<String, Object>> szdd : size.entrySet())
+        {
+            szdd.getValue().put("chart","");
+            Map<String, Object> x = szdd.getValue();
+            if (x.get("sel") != null)
+                title = String.valueOf(x.get("tit"));
+        }
+        Object cuont = dsd.get("1").get("cou");
+
+        Map<String,String> callbackAddChart = new HashMap<>();
+        callbackAddChart.put("objId", String.valueOf(objectSend.getId()));
+        callbackAddChart.put("act", "addChartSave");
+
+        InlineKeyboardButton addToChart = InlineKeyboardButton.builder()
+                .text("Сохранить ("+title +") "+ cuont +" " +params.get("measurement"))
+                .callbackData(new JSONObject(callbackAddChart).toString())
+                .build();
+        ///bot.answer_callback_query(call.id, text="Дата выбрана")
+
+        lines.add(List.of(addToChart));
+        kb.setKeyboard(lines);
+
+        SendPhoto sendPhoto = SendPhoto.builder()
+                .chatId(chat_id)
+                .parseMode("HTML")
+                .photo(new InputFile(
+                        params.get("main_photo") != null ?
+                                params.get("main_photo").toString() :
+                                "https://cdn-icons-png.flaticon.com/512/73/73530.png"))
+                .caption(params.get("title").toString())
+                .replyMarkup(kb)
+                .build();
+
+        try {
+            ClientButton.proxyClient.startBotUser.update.getCallbackQuery();
+            Message message = ClientButton.proxyClient.startBotUser.execute(sendPhoto);
+            objectSend.setObjectId(Long.valueOf(message.getMessageId()));
+            objectSendDAO.updateObject(objectSend);
+            ClientButton.proxyClient.startBotUser.execute(DeleteMessage.builder().messageId(Math.toIntExact(objectId)).chatId(chat_id).build());
+            return Long.valueOf(1);
         } catch (TelegramApiException e) {
             throw new RuntimeException(e);
         }

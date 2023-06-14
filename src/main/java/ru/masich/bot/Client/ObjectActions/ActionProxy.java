@@ -4,11 +4,14 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.json.JSONObject;
 import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageReplyMarkup;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
+import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import ru.masich.bot.Client.ClientBigObject;
 import ru.masich.bot.Client.Func.ChartFunc;
 import ru.masich.bot.Client.Func.CheckBox;
 import ru.masich.bot.DAO.IMPL.ObjectSendDAOimpl;
@@ -129,6 +132,39 @@ public class ActionProxy {
             ChartFunc.add(proxyClient.startBotUser, objectSend, product);
             return;
         }
+        //Добавление в корзину при ее редактировании
+        if(jsonObject.get("act").equals("addChartSave")) {
+            logger.info("("+this.getClass().getSimpleName()+".java:"+new Throwable().getStackTrace()[0].getLineNumber()+")"+"<< proxy act addChartSave");
+            int productId = (int) objectSend.getProperty().get("productId");
+            Product product = productDAO.get(productId);
+
+            ChartFunc.add(proxyClient.startBotUser, objectSend, product);
+
+            //Удаляем товар с картинкой
+            try {
+                proxyClient.startBotUser.execute(DeleteMessage
+                        .builder()
+                        .chatId(objectSend.getUserId())
+                        .messageId(Math.toIntExact(objectSend.getObjectId()))
+                        .build());
+            } catch (TelegramApiException e) {
+                throw new RuntimeException(e);
+            }
+
+
+
+            ChartMenu chartMenu = new ChartMenu();
+            //Отправляем текстовый вид корзины и получаем его id
+            Message message = chartMenu.sendActiveChartNew(proxyClient.startBotUser, "");
+            objectSend.setObjectId(Long.valueOf(message.getMessageId()));
+            objectSendDAO.updateObject(objectSend);
+            chartMenu.edit(proxyClient.startBotUser, objectSend);
+
+            //Удаляем старый товар
+            ClientBigObject clientBigObject = new ClientBigObject();
+            clientBigObject.chartDell(proxyClient.startBotUser, objectSend);
+            return;
+        }
         //Редактируем корзину
         if(jsonObject.get("act").equals("chartEdit")) {
             logger.info("("+this.getClass().getSimpleName()+".java:"+new Throwable().getStackTrace()[0].getLineNumber()+")"+"<< proxy act chartEdit");
@@ -141,6 +177,7 @@ public class ActionProxy {
             logger.info("("+this.getClass().getSimpleName()+".java:"+new Throwable().getStackTrace()[0].getLineNumber()+")"+"<< proxy act chartCommit");
             return;
         }
+
 
 
     }
@@ -201,18 +238,30 @@ public class ActionProxy {
                     title.append(x.get("tit"));
             }
 
-
-
         Object cuont = objectSendProperty.get("count") == null ?
                 dsd.get("1").get("cou") :
                 objectSendProperty.get("count").toString();
 
+
+
         Map<String,String> callbackAddChart = new HashMap<>();
         callbackAddChart.put("objId", String.valueOf(objectId));
-        callbackAddChart.put("act", "addChart");
+
+
+        String text = "";
+        //Если это карточка корзины
+        if(objectSend.getProperty().containsKey("chart")){
+            callbackAddChart.put("act", "addChartSave");
+            text = "Сохранить ("+title +") "+ cuont +" " +product.getProductAttributes().get("measurement");
+        }
+        else {
+            text = "Добавить в корзину: ("+title +") "+ cuont +" " + productAttributes.get("measurement");
+            callbackAddChart.put("act", "addChart");
+        }
+
 
         InlineKeyboardButton addToChart = InlineKeyboardButton.builder()
-                .text("Добавить в корзину: ("+title +") "+ cuont +" " + productAttributes.get("measurement"))
+                .text(text)
                 .callbackData(new JSONObject(callbackAddChart).toString())
                 .build();
 

@@ -55,10 +55,13 @@ public class ChartFunc {
             if (x.get("sel") != null)
                 selProductID = Integer.parseInt(sdfsfef.getKey());
         }
+        Map<String, Object>cs1 =  product.getProductAttributes();
+        Map<String, Object> dasd = (Map<String, Object>) cs1.get("count_property");
+        Map<String, Object> dasdw = (Map<String, Object>) dasd.get("1");
 
         String count = objectSendProp.get("count") != null ?
                 String.valueOf(objectSendProp.get("count")) :
-                ((List<Map<String, String>>) product.getProductAttributes().get("count_property")).get(0).get("count");
+                dasdw.get("count").toString();
 
         productCh.put("count", count);
 

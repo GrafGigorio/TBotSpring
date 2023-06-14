@@ -43,7 +43,8 @@ public class ClientButton {
         if(callbackQuery.getData().contains("bigObj"))
         {
             logger.info("(ClientButton"+".java:"+new Throwable().getStackTrace()[0].getLineNumber()+")"+"<< execute bigObj ");
-            ClientBigObject.process(proxyClient);
+            ClientBigObject clientBigObject = new ClientBigObject();
+            clientBigObject.process(proxyClient);
             return;
         }
 
