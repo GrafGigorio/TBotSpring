@@ -81,7 +81,7 @@ public class ActionProxy {
             objectSendProp.put("count", count);
 
             //Если пустое свойство размера
-            if(objectSendProp.get("objectSendProp") == null) {
+            if(objectSendProp.get("check_box_prop") == null) {
                 Map<String, Map<String, Object>> check_box_prop = (Map<String, Map<String, Object>>) product.getProductAttributes().get("check_box_prop");
                 objectSendProp.put("check_box_prop", check_box_prop);
             }
@@ -115,7 +115,7 @@ public class ActionProxy {
             objectSendProp.put("count", count);
 
             //Если пустое свойство размера
-            if(objectSendProp.get("objectSendProp") == null) {
+            if(objectSendProp.get("check_box_prop") == null) {
                 Map<String, Map<String, Object>> check_box_prop = (Map<String, Map<String, Object>>) product.getProductAttributes().get("check_box_prop");
                 objectSendProp.put("check_box_prop", check_box_prop);
             }

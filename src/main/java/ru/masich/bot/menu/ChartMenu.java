@@ -106,7 +106,8 @@ public class ChartMenu {
     }
     private void updateVars(StartBotUser userBot)
     {
-        logger.info("(ChartMenu.java:"+new Throwable().getStackTrace()[0].getLineNumber()+")"+"<< sendActiveChart");
+        logger.info("("+this.getClass().getSimpleName()+".java:"
+                +new Throwable().getStackTrace()[0].getLineNumber()+")"+"<< updateVars");
 
         if(userBot.update.hasCallbackQuery())
             chatID = userBot.update.getCallbackQuery().getFrom().getId();
@@ -126,18 +127,12 @@ public class ChartMenu {
             Product product1 = productDAO.get((Integer) product.get("productId"));
             Map<String, Object> prodictAtr = product1.getProductAttributes();
 
+            //Получаем свойства размера продуктов
             Map<String , Object> checks = (Map<String, Object>) prodictAtr.get("check_box_prop");
-            //   .get((Integer) product.get("selId") - 1).get("tit");
-            String selected = "";
-            for(Map.Entry<String , Object> ddas : checks.entrySet())
-            {
-                Map<String , Object> dsq = (Map<String, Object>) ddas.getValue();
-                if(dsq.get("sel") != null)
-                {
-                    selected = (String) dsq.get("tit");
-                }
-            }
-            stringBuilder.append(prodictAtr.get("title") + "("+selected+") количество: " + product.get("count") + (product1.getProductAttributes()).get("measurement"));
+            //Получаем свойство выбранного размера
+            Map<String, Object> parD = (Map<String, Object>) checks.get(product.get("selId").toString());
+
+            stringBuilder.append(prodictAtr.get("title") + "("+parD.get("tit")+") количество: " + product.get("count") + (product1.getProductAttributes()).get("measurement"));
             stringBuilder.append("\r\n");
 
         }

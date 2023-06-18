@@ -37,7 +37,7 @@ public class ClientBigObject {
         HashMapConverter convert = new HashMapConverter();
         String bigObjectID = (String) convert.convertToEntityAttribute(callbackQuery.getData()).get("bigObj");
         BIgObject bIgObject = bigObjectDAO.get(Integer.parseInt(bigObjectID));
-        logger.info("(ClientBigObject.java:"
+        logger.info("("+this.getClass().getSimpleName()+".java:"
                 +new Throwable().getStackTrace()[0].getLineNumber()+")"+"<< process data "
                 + callbackQuery.getData() +" " + bIgObject);
 
@@ -48,16 +48,21 @@ public class ClientBigObject {
 
         //Удаление товара из корзины
         if(bIgObject.getData().get("act").equals("chartPrDel")){
+            logger.info("("+this.getClass().getSimpleName()+".java:"
+                    +new Throwable().getStackTrace()[0].getLineNumber()+")"+"<< Кнопка удаления товара ");
             chartDellLoc(bIgObject,proxyClient.startBotUser, objectSend);
             return;
         }
         //Меню редактирования корзины
         if(bIgObject.getData().get("act").equals("chartSave")){
-
+            logger.info("("+this.getClass().getSimpleName()+".java:"
+                    +new Throwable().getStackTrace()[0].getLineNumber()+")"+"<< Кнопка Сохранить при редактировании корзины ");
             new ChartMenu().sendActiveChartEdit(proxyClient.startBotUser, objId);
             return;
         }
         if(bIgObject.getData().get("act").equals("chartProductEdit")){
+            logger.info("("+this.getClass().getSimpleName()+".java:"
+                    +new Throwable().getStackTrace()[0].getLineNumber()+")"+"<< Кнопка Изменить товар");
 
             int productId = (int) bIgObject.getData().get("productId");
             int productSelect = (int) bIgObject.getData().get("productSelect");
@@ -74,6 +79,8 @@ public class ClientBigObject {
     }
     public void chartDell(StartBotUser startBotUser , ObjectSend objectSend)
     {
+        logger.info("("+this.getClass().getSimpleName()+".java:"
+                +new Throwable().getStackTrace()[0].getLineNumber()+")"+"<< удаление товара из корзины голобальная функция");
         Map<String, Object> objectMap = (Map<String, Object>) objectSend.getProperty().get("chart");
         //Получаем необходимые атрибуты
         int productId = Integer.parseInt((String) objectMap.get("productId"));
@@ -98,6 +105,8 @@ public class ClientBigObject {
     }
     public void chartDellLoc(BIgObject bIgObject, StartBotUser startBotUser , ObjectSend objectSend)
     {
+        logger.info("("+this.getClass().getSimpleName()+".java:"
+                +new Throwable().getStackTrace()[0].getLineNumber()+")"+"<< удаление товара из корзины локальная функция");
         //Получаем необходимые атрибуты
         int productId = Integer.parseInt(bIgObject.getData().get("productId").toString());
         int productSelect = Integer.parseInt(bIgObject.getData().get("productSelect").toString());
