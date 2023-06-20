@@ -2,7 +2,7 @@ package ru.masich.bot.action.store;
 
 import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-import ru.masich.Sheets.Sheets;
+import ru.masich.Sheets.GoogleSheets;
 import ru.masich.bot.DAO.IMPL.CatalogDAOimpl;
 import ru.masich.bot.DAO.IMPL.ProductDAOimpl;
 import ru.masich.bot.DAO.IMPL.StoreDAOimpl;
@@ -85,17 +85,17 @@ public class Upload {
         }
 
         try {
-            Sheets.clear("Категории!A3:F");
-            Sheets.save(catalogOut, "Категории!A3:F");
+            GoogleSheets.clear("Категории!A3:F");
+            GoogleSheets.save(catalogOut, "Категории!A3:F");
 
-            Sheets.clear("Товары!A3:F");
-            Sheets.save(productOut, "Товары!A3:F");
+            GoogleSheets.clear("Товары!A3:F");
+            GoogleSheets.save(productOut, "Товары!A3:F");
 
-            Sheets.clear("Размер!A3:E");
-            Sheets.save(productSizeOut, "Размер!A3:E");
+            GoogleSheets.clear("Размер!A3:E");
+            GoogleSheets.save(productSizeOut, "Размер!A3:E");
 
-            Sheets.clear("Количество!A3:E");
-            Sheets.save(productCountOut, "Количество!A3:E");
+            GoogleSheets.clear("Количество!A3:E");
+            GoogleSheets.save(productCountOut, "Количество!A3:E");
 
             butIn.startBot.execute(AnswerCallbackQuery.builder()
                     .callbackQueryId(butIn.update.getCallbackQuery().getId())

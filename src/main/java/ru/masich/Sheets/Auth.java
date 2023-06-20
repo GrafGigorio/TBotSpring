@@ -33,8 +33,8 @@ public class Auth {
      * Global instance of the scopes required by this quickstart.
      * If modifying these scopes, delete your previously saved tokens/ folder.
      */
-    private static final List<String> SCOPES =
-            List.of(DriveScopes.DRIVE_READONLY, SheetsScopes.SPREADSHEETS);
+    public static final List<String> SCOPES =
+            List.of(DriveScopes.DRIVE, SheetsScopes.SPREADSHEETS);
     private static final String CREDENTIALS_FILE_PATH = "/credentials.json";
 
     /**
@@ -60,6 +60,7 @@ public class Auth {
                 HTTP_TRANSPORT, JSON_FACTORY, clientSecrets, SCOPES)
                 .setDataStoreFactory(new FileDataStoreFactory(new java.io.File(TOKENS_DIRECTORY_PATH)))
                 .setAccessType("offline")
+
                 .build();
         LocalServerReceiver receiver = new LocalServerReceiver.Builder().setPort(8888).build();
         //returns an authorized Credential object.

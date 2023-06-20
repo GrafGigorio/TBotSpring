@@ -43,7 +43,7 @@ public class DriveQuickstart {
      * Global instance of the scopes required by this quickstart.
      * If modifying these scopes, delete your previously saved tokens/ folder.
      */
-    private static final List<String> SCOPES =
+    public static final List<String> SCOPES =
             List.of(DriveScopes.DRIVE_READONLY, SheetsScopes.SPREADSHEETS);
     private static final String CREDENTIALS_FILE_PATH = "/credentials.json";
 

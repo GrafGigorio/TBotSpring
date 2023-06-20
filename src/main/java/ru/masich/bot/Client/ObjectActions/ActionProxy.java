@@ -8,6 +8,7 @@ import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageReplyMarkup;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Message;
+import org.telegram.telegrambots.meta.api.objects.payments.ShippingQuery;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
@@ -151,8 +152,6 @@ public class ActionProxy {
                 throw new RuntimeException(e);
             }
 
-
-
             ChartMenu chartMenu = new ChartMenu();
             //Отправляем текстовый вид корзины и получаем его id
             Message message = chartMenu.sendActiveChartNew(proxyClient.startBotUser, "");
@@ -174,11 +173,13 @@ public class ActionProxy {
         }
         //Оформляем заказ
         if(jsonObject.get("act").equals("chartCommit")) {
-            logger.info("("+this.getClass().getSimpleName()+".java:"+new Throwable().getStackTrace()[0].getLineNumber()+")"+"<< proxy act chartCommit");
+            logger.info("("+this.getClass().getSimpleName()+".java:"+new Throwable().getStackTrace()[0].getLineNumber()+")"+"<< Кнопка офрмить заказ");
+
+            ShippingQuery shippingQuery = new ShippingQuery();
+//            shippingQuery.get
+
             return;
         }
-
-
 
     }
     private void setProperty(ObjectSend objectSend, Product product)

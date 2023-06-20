@@ -3,7 +3,7 @@ package ru.masich.bot.action.store;
 import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-import ru.masich.Sheets.Sheets;
+import ru.masich.Sheets.GoogleSheets;
 import ru.masich.bot.DAO.IMPL.CatalogDAOimpl;
 import ru.masich.bot.DAO.IMPL.ProductDAOimpl;
 import ru.masich.bot.DAO.interfaces.CatalogDAO;
@@ -44,7 +44,7 @@ public class Download {
         List<List<Object>> catalog;
 
         try {
-            catalog = Sheets.get(catTable);//Категории!A3:F
+            catalog = GoogleSheets.get(catTable);//Категории!A3:F
         } catch (GeneralSecurityException | IOException e) {
             throw new RuntimeException(e);
         }
@@ -96,9 +96,9 @@ public class Download {
         List<List<Object>> count;
 
         try {
-            products = Sheets.get(proTable);
-            size = Sheets.get(sizeTable);
-            count = Sheets.get(countTable);
+            products = GoogleSheets.get(proTable);
+            size = GoogleSheets.get(sizeTable);
+            count = GoogleSheets.get(countTable);
         } catch (GeneralSecurityException | IOException e) {
             throw new RuntimeException(e);
         }
@@ -153,7 +153,7 @@ public class Download {
 
         try {
             //Получаем размеры из таблици
-            size = Sheets.get(sizeTable);
+            size = GoogleSheets.get(sizeTable);
         } catch (GeneralSecurityException | IOException e) {
             throw new RuntimeException(e);
         }
@@ -203,7 +203,7 @@ public class Download {
 
         try {
             //Получаем обьект количества из таблицы
-            countTable = Sheets.get(sizeTable);
+            countTable = GoogleSheets.get(sizeTable);
         } catch (GeneralSecurityException | IOException e) {
             throw new RuntimeException(e);
         }
@@ -453,10 +453,10 @@ public class Download {
         List<List<Object>> size;
         List<List<Object>> count;
         try {
-            catalog = Sheets.get("Категории!A3:F");
-            product = Sheets.get("Товары!A3:F");
-            size = Sheets.get("Размер!A3:F");
-            count = Sheets.get("Количество!A3:F");
+            catalog = GoogleSheets.get("Категории!A3:F");
+            product = GoogleSheets.get("Товары!A3:F");
+            size = GoogleSheets.get("Размер!A3:F");
+            count = GoogleSheets.get("Количество!A3:F");
         } catch (GeneralSecurityException | IOException e) {
             throw new RuntimeException(e);
         }
