@@ -14,10 +14,20 @@ public class Store {
     private Long id;
     private Long userid;
     private String title;
+    private String tableID;
+    private String chartID;
+    private String folderID;
     @Convert(converter = HashMapConverter.class)
     private Map<String, Object> role;
 
-
+    public Store(Long userid, String title,String folderID, String tableID, String chartID, Map<String, Object> role) {
+        this.userid = userid;
+        this.title = title;
+        this.tableID = tableID;
+        this.chartID = chartID;
+        this.folderID = folderID;
+        this.role = role;
+    }
     public Store(Long userid, String title, Map<String, Object> role) {
         this.userid = userid;
         this.title = title;
@@ -69,16 +79,40 @@ public class Store {
         this.role = role;
     }
 
+    public String getTableID() {
+        return tableID;
+    }
+
+    public void setTableID(String tableID) {
+        this.tableID = tableID;
+    }
+
+    public String getChartID() {
+        return chartID;
+    }
+
+    public void setChartID(String chartID) {
+        this.chartID = chartID;
+    }
+
+    public String getFolderID() {
+        return folderID;
+    }
+
+    public void setFolderID(String folderID) {
+        this.folderID = folderID;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Store store = (Store) o;
-        return id.equals(store.id) && userid.equals(store.userid) && Objects.equals(title, store.title);
+        return Objects.equals(id, store.id) && Objects.equals(userid, store.userid) && Objects.equals(title, store.title) && Objects.equals(tableID, store.tableID) && Objects.equals(chartID, store.chartID) && Objects.equals(folderID, store.folderID) && Objects.equals(role, store.role);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, userid, title);
+        return Objects.hash(id, userid, title, tableID, chartID, folderID, role);
     }
 }

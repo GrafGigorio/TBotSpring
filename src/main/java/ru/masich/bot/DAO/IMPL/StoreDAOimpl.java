@@ -60,7 +60,7 @@ public class StoreDAOimpl implements StoreDao {
     }
 
     @Override
-    public Store saveOrUpdateStore(Store store) {
+    public void saveOrUpdateStore(Store store) {
         logger.info("("+this.getClass().getSimpleName()+".java:"+new Throwable().getStackTrace()[0].getLineNumber()+")"+"<<  saveOrUpdateStore store " + store);
         //Session session = sessionFactory.getCurrentSession();
         try {
@@ -68,14 +68,13 @@ public class StoreDAOimpl implements StoreDao {
             session.beginTransaction();
             session.saveOrUpdate(store);
             session.getTransaction().commit();
-            return store;
         } finally {
             session.close();
         }
     }
 
     @Override
-    public Store deleteStore(Store store) {
+    public void deleteStore(Store store) {
         logger.info("("+this.getClass().getSimpleName()+".java:"+new Throwable().getStackTrace()[0].getLineNumber()+")"+"<< deleteStore store " + store);
         //Session session = sessionFactory.getCurrentSession();
         try {
@@ -83,7 +82,6 @@ public class StoreDAOimpl implements StoreDao {
             session.beginTransaction();
             session.delete(store);
             session.getTransaction().commit();
-            return store;
         } finally {
             session.close();
         }

@@ -6,4 +6,5 @@ public interface BigObjectDAO {
     BIgObject get(int id);
     void save(int userId, String data);
     void save(BIgObject object);
+    void delete(BIgObject object);
 }

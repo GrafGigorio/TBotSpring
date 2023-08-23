@@ -53,4 +53,17 @@ public class BigObjectimpl implements BigObjectDAO {
             session.close();
         }
     }
+
+    @Override
+    public void delete(BIgObject object) {
+        logger.info("("+this.getClass().getSimpleName()+".java:"+new Throwable().getStackTrace()[0].getLineNumber()+")"+"<< save object " + object);
+        try {
+            session = sessionFactory.openSession();
+            session.beginTransaction();
+            session.delete(object);
+            session.getTransaction().commit();
+        } finally {
+            session.close();
+        }
+    }
 }

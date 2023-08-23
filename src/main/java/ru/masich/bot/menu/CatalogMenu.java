@@ -1,24 +1,25 @@
 package ru.masich.bot.menu;
 
+import com.google.api.client.auth.oauth2.Credential;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
-import ru.masich.bot.DAO.IMPL.CatalogDAOimpl;
-import ru.masich.bot.DAO.IMPL.ProductDAOimpl;
-import ru.masich.bot.DAO.IMPL.StoreDAOimpl;
-import ru.masich.bot.DAO.IMPL.UserBotDAOImpl;
-import ru.masich.bot.DAO.interfaces.CatalogDAO;
-import ru.masich.bot.DAO.interfaces.ProductDAO;
-import ru.masich.bot.DAO.interfaces.StoreDao;
-import ru.masich.bot.DAO.interfaces.UserBotDAO;
+import ru.masich.Sheets.Auth;
+import ru.masich.Sheets.GoogleSheets;
+import ru.masich.bot.DAO.IMPL.*;
+import ru.masich.bot.DAO.interfaces.*;
 import ru.masich.bot.Var;
+import ru.masich.bot.entity.BIgObject;
 import ru.masich.bot.entity.Product;
 import ru.masich.bot.entity.Store;
 import ru.masich.bot.entity.UserBot;
 
+import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -155,14 +156,6 @@ public class CatalogMenu {
                         .build()
         ));
 
-//        storeLines.add(List.of(
-//                InlineKeyboardButton
-//                        .builder()
-//                        .text("Список товаров")
-//                        .callbackData(Var.productGetList+store.getId()+":"+catalog)
-//                        .build()
-//        ));
-
         List<InlineKeyboardButton> line = new ArrayList<>();
         line.add(                InlineKeyboardButton
                 .builder()
@@ -176,35 +169,59 @@ public class CatalogMenu {
                 .build());
         storeLines.add(line);
 
-        storeLines.add(List.of(
-
-                InlineKeyboardButton
-                .builder()
-                        .url("https://docs.google.com/spreadsheets/d/1U-SBrEWiB8jI4ASeiDIQMu75NTWOxadhYCKroVhCQNE/")
-                .text("\uD83D\uDD17 Открыть гугл таблицы \uD83D\uDD17")
-                .build()
-        ));
-        storeLines.add(List.of(
-                InlineKeyboardButton
-                .builder()
-                .text("⬆\uFE0F Сбросить изменения в таблицах ⬆\uFE0F")
-                .callbackData("store:upload:"+store.getId())
-                .build()
-        ));
-        storeLines.add(List.of(
-                InlineKeyboardButton
-                .builder()
-                .text("⬇\uFE0F Принять изменения из гугл таблиц ⬇\uFE0F")
-                .callbackData("store:download:"+store.getId())
-                .build()
-        ));
-        storeLines.add(List.of(
-                InlineKeyboardButton
-                        .builder()
-                        .text("✅\uFE0F Проверить результат загрузки в программу✅\uFE0F")
-                        .callbackData("store:check:"+store.getId())
-                        .build()
-        ));
+        if(store.getTableID() != null && !store.getTableID().equals("")) {
+            storeLines.add(List.of(
+                    InlineKeyboardButton
+                            .builder()
+                            .url("https://docs.google.com/spreadsheets/d/" + store.getTableID() + "/")
+                            .text("\uD83D\uDD17 Открыть гугл таблицы \uD83D\uDD17")
+                            .build()
+            ));
+            storeLines.add(List.of(
+                    InlineKeyboardButton
+                            .builder()
+                            .text("⬆\uFE0F Сбросить изменения в таблицах ⬆\uFE0F")
+                            .callbackData("table:upload:" + store.getId())
+                            .build()
+            ));
+            storeLines.add(List.of(
+                    InlineKeyboardButton
+                            .builder()
+                            .text("⬇ Принять изменения из гугл таблиц ⬇")
+                            .callbackData("table:download:" + store.getId())
+                            .build()
+            ));
+            storeLines.add(List.of(
+                    InlineKeyboardButton
+                            .builder()
+                            .text("✅ Проверить результат загрузки в программу✅")
+                            .callbackData("table:check:" + store.getId())
+                            .build()
+            ));
+            storeLines.add(List.of(
+                    InlineKeyboardButton
+                            .builder()
+                            .text("✏Управлять правами на гугл таблицу✏")
+                            .callbackData("table:permissions:" + store.getId())
+                            .build()
+            ));
+            storeLines.add(List.of(
+                    InlineKeyboardButton
+                            .builder()
+                            .text("❌ Удалить таблицу ❌")
+                            .callbackData("table:delete:" + store.getId())
+                            .build()
+            ));
+        }
+        else {
+            storeLines.add(List.of(
+                    InlineKeyboardButton
+                            .builder()
+                            .text("➕ Создать гугл таблицу ➕")
+                            .callbackData("table:create:" + store.getId())
+                            .build()
+            ));
+        }
         storeLines.add(List.of(
                 InlineKeyboardButton
                         .builder()
@@ -317,6 +334,63 @@ public class CatalogMenu {
 
         storeLines.add(List.of(InlineKeyboardButton.builder().text("◀ Назад на главную").callbackData(Var.startMenu).build()));
         return InlineKeyboardMarkup.builder().keyboard(storeLines)
+                .build();
+    }
+    public static InlineKeyboardMarkup getGTablePermissonMenu(Store store) {
+        logger.info("(CatalogMenu.java:"+new Throwable().getStackTrace()[0].getLineNumber()+")"+"<< getGTablePermissonMenu");
+
+        List<List<InlineKeyboardButton>> but = new ArrayList<>();
+        List<Map<String, String>> permissions = new ArrayList<>();
+        Credential credential = null;
+
+        BigObjectDAO bigObjectDAO = new BigObjectimpl();
+
+        try {
+            credential = Auth.getCredentialsServiceResources();
+            permissions = GoogleSheets.getPermissionSpreadsheet(credential, store.getTableID());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (GeneralSecurityException e) {
+            throw new RuntimeException(e);
+        }
+
+        for (Map<String, String> acced : permissions)
+        {
+            if(acced.get("role").equals("owner"))
+                continue;
+
+            BIgObject bIgObject = new BIgObject();
+            //bIgObject.setUserId(userId);
+
+            Map<String, Object > obj = new LinkedHashMap<>();
+            obj.put("act","table:delPerm:" + acced.get("id") +":"+ store.getTableID()+":"+store.getId());
+
+            bIgObject.setData(obj);
+
+            bigObjectDAO.save(bIgObject);
+
+            List<InlineKeyboardButton> line = new ArrayList<>();
+//            line.add(
+//                    InlineKeyboardButton
+//                            .builder()
+//                            .text("✅ " + acced.get("emailAddress"))
+//                            .callbackData("table:HZ:")
+//                            .build());
+            //                    .callbackData("{\"bigObj\":\""+dell.getId()+"\"}")
+            line.add(
+                    InlineKeyboardButton
+                            .builder()
+                            .text("❌ " + acced.get("emailAddress") + " ❌")
+
+                            .callbackData("bigObj:"+bIgObject.getId())
+                            .build());
+            but.add(line);
+        }
+
+        but.add(List.of(InlineKeyboardButton.builder().text("➕ Добавить права ➕").callbackData("table:addPerm:"+store.getId()).build()));
+        but.add(List.of(InlineKeyboardButton.builder().text("◀ Назад").callbackData(Var.storeGet + store.getId()).build()));
+
+        return InlineKeyboardMarkup.builder().keyboard(but)
                 .build();
     }
 }

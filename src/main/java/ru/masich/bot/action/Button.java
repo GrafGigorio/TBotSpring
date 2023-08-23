@@ -14,14 +14,12 @@ import ru.masich.StartBot;
 import ru.masich.bot.DAO.IMPL.*;
 import ru.masich.bot.DAO.interfaces.*;
 import ru.masich.bot.Var;
-import ru.masich.bot.action.store.Download;
-import ru.masich.bot.action.store.Upload;
-import ru.masich.bot.entity.Await;
-import ru.masich.bot.entity.LastMessage;
-import ru.masich.bot.entity.Store;
-import ru.masich.bot.entity.UserBot;
+import ru.masich.bot.action.store.StoreTable;
+import ru.masich.bot.entity.*;
 import ru.masich.bot.menu.CatalogMenu;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 public class Button {
@@ -33,14 +31,15 @@ public class Button {
     public Update update;
 
     Logger logger = LoggerFactory.getLogger(Button.class);
+
     public Button(StartBot startBot, Update update) {
         this.startBot = startBot;
         this.update = update;
     }
 
-    public void execute(Update update)
-    {
-        logger.info("("+this.getClass().getSimpleName()+".java:"+new Throwable().getStackTrace()[0].getLineNumber()+")"+"<< execute " + update.getCallbackQuery().getData());
+    public void execute(Update update) {
+        logger.info("(" + this.getClass().getSimpleName() + ".java:" + new Throwable().getStackTrace()[0].getLineNumber() +
+                ")" + "<< execute " + update.getCallbackQuery().getData());
         UserBot userBot = userBotDAO.getUserBot(update.getCallbackQuery().getFrom());
         CatalogDAO catalogDAO = new CatalogDAOimpl();
 
@@ -48,48 +47,73 @@ public class Button {
         Long objId2 = -1L;
         Long objId3 = -1L;
         String mes = "";
-        String[] comandSeq = update.getCallbackQuery().getData().split(":");
-        if(comandSeq.length > 2)
-        {
-            if(comandSeq.length > 3)
-                objId2 = Long.valueOf(comandSeq[3]);
-            if(comandSeq.length > 4)
-                objId3 = Long.valueOf(comandSeq[4]);
-            objId = Long.valueOf(comandSeq[2]);
-            mes = comandSeq[0]+":"+comandSeq[1]+":";
+        String[] commandSeqArr = update.getCallbackQuery().getData().split(":");
+        List<String> commandSeqList = new ArrayList<>(List.of(commandSeqArr));
+        String callbackId = update.getCallbackQuery().getId();
+
+        if (commandSeqList.get(0).equals("bigObj")) {
+            commandSeqList.remove(0);
+
+            BigObjectDAO bigObjectDAO = new BigObjectimpl();
+            BIgObject bIgObject = bigObjectDAO.get(Integer.parseInt(commandSeqList.get(0)));
+
+            Map<String,Object> param = bIgObject.getData();
+            String paramDS = (String) param.get("act");
+
+            bigObjectDAO.delete(bIgObject);
+
+            commandSeqArr = paramDS.split(":");
+
+            commandSeqList = new ArrayList<>(List.of(commandSeqArr));
         }
-        else
-        {
+
+        if (commandSeqList.get(0).equals("table")) {
+            commandSeqList.remove(0);
+            StoreTable storeTable = new StoreTable(commandSeqList, startBot, update, callbackId, userBot.getId());
+            storeTable.exec();
+            return;
+        }
+
+        if (commandSeqArr.length > 2) {
+            if (commandSeqArr.length > 3)
+                objId2 = Long.valueOf(commandSeqArr[3]);
+            if (commandSeqArr.length > 4)
+                objId3 = Long.valueOf(commandSeqArr[4]);
+
+            if (commandSeqArr[1].equals("table"))
+                objId = Long.valueOf(commandSeqArr[3]);
+            else
+                objId = Long.valueOf(commandSeqArr[2]);
+            mes = commandSeqArr[0] + ":" + commandSeqArr[1] + ":";
+        } else {
             mes = update.getCallbackQuery().getData();
         }
 
         Long chatId = update.getCallbackQuery().getFrom().getId();
         LastMessage lastMessage = lastMessageDAO.getLastMessage(userBot.getId());
         int msgId = lastMessage.getLastMessageId().intValue();
-        String callbackId = update.getCallbackQuery().getId();
 
 
-        switch (mes)
-        {
+        switch (mes) {
             case Var.startMenu -> {
-                editMessage(chatId,callbackId,Var.getStartMenuTitle,msgId, CatalogMenu.getStartMenu(userBot.getId()));
+                editMessage(chatId, callbackId, Var.getStartMenuTitle, msgId, CatalogMenu.getStartMenu(userBot.getId()));
             }
             case Var.createStore -> {
                 Await await = new Await(userBot.getId(), Var.createStore);
                 awaitDao.set(await);
-                editMessage(chatId,callbackId,"Введите название нового магазина!",msgId);
+                editMessage(chatId, callbackId, "Введите название нового магазина!", msgId);
             }
             case Var.getMyStores -> {
-                editMessage(chatId,callbackId,"Список магазинов",msgId, CatalogMenu.getStoresList(userBot.getId()));
+                editMessage(chatId, callbackId, "Список магазинов", msgId, CatalogMenu.getStoresList(userBot.getId()));
             }
             case Var.storeGet -> {
                 Store store = storeDao.getStore(objId);
-                editMessage(chatId,callbackId,"Меню магазана " + store.getTitle(),msgId, CatalogMenu.getStoreMenu(store,objId2,objId3));
+                editMessage(chatId, callbackId, "Меню магазана " + store.getTitle(), msgId, CatalogMenu.getStoreMenu(store, objId2, objId3));
             }
             case Var.storeEdit -> {
-                Await await = new Await(userBot.getId(), Var.storeEdit + objId );
+                Await await = new Await(userBot.getId(), Var.storeEdit + objId);
                 awaitDao.set(await);
-                editMessage(chatId,callbackId,"В ведите новое название магазина",msgId);
+                editMessage(chatId, callbackId, "В ведите новое название магазина", msgId);
             }
             case Var.storeDelete -> {
                 Store store = storeDao.getStore(objId);
@@ -97,8 +121,8 @@ public class Button {
                 roles.remove(String.valueOf(store.getId()));
                 userBotDAO.update(userBot);
                 storeDao.deleteStore(store);
-                editMessage(chatId,callbackId,"Магазин #"+store.getId() +" "+store.getTitle() + " удален!", msgId);
-                Message message = sendMenu(userBot.getTgId(),Var.getStoresTitle, CatalogMenu.getStoresList(userBot.getId()));
+                editMessage(chatId, callbackId, "Магазин #" + store.getId() + " " + store.getTitle() + " удален!", msgId);
+                Message message = sendMenu(userBot.getTgId(), Var.getStoresTitle, CatalogMenu.getStoresList(userBot.getId()));
                 lastMessage.setLastMessageId(message.getMessageId());
                 lastMessageDAO.updateLastMessage(lastMessage);
             }
@@ -106,27 +130,25 @@ public class Button {
                 //В данной ситуации objId это id магазина
                 //а objId2 это id родительского catalog
 
-                Await await = new Await(userBot.getId(), Var.catalogCreate+objId+":"+objId2+":"+objId3);
+                Await await = new Await(userBot.getId(), Var.catalogCreate + objId + ":" + objId2 + ":" + objId3);
                 awaitDao.set(await);
-                editMessage(chatId,callbackId,"Введите название нового каталога!",msgId);
+                editMessage(chatId, callbackId, "Введите название нового каталога!", msgId);
             }
             case Var.catalogGet -> {
                 Store store = storeDao.getStore(objId);
-                String  title = store.getTitle();
-                if(objId3 != -1)
-                {
-                    title = "Меню каталога " +catalogDAO.get(objId3).getTitle();
+                String title = store.getTitle();
+                if (objId3 != -1) {
+                    title = "Меню каталога " + catalogDAO.get(objId3).getTitle();
                 }
-                if(objId2 == -1 && objId3 == -1)
-                {
+                if (objId2 == -1 && objId3 == -1) {
                     title = "Меню магазина " + storeDao.getStore(objId).getTitle();
                 }
-                editMessage(chatId,callbackId,title,msgId, CatalogMenu.getCatalogMenu(objId, objId2, objId3, title));
+                editMessage(chatId, callbackId, title, msgId, CatalogMenu.getCatalogMenu(objId, objId2, objId3, title));
             }
             case Var.catalogEdit -> {
-                Await await = new Await(userBot.getId(), Var.catalogEdit + objId );
+                Await await = new Await(userBot.getId(), Var.catalogEdit + objId);
                 awaitDao.set(await);
-                editMessage(chatId,callbackId,"В ведите новое название магазина", msgId);
+                editMessage(chatId, callbackId, "В ведите новое название магазина", msgId);
             }
             case Var.catalogDelete -> {
                 ru.masich.bot.entity.Catalog catalog = catalogDAO.get(objId);
@@ -136,16 +158,14 @@ public class Button {
                 InlineKeyboardMarkup inlineKeyboardMarkup = null;
                 String title = "";
                 //Если корневой каталог выводи его содержимое если нет то выводим список на уровень выше
-                if(fat == null || fat == -1)
-                {
-                    inlineKeyboardMarkup = CatalogMenu.getStoresList(catalog.getShopId());
-                    title = Var.catalogGetMasterTitle +" " +storeDao.getStore(catalog.getShopId()).getTitle();
+                if (fat == null || fat == -1) {
+                    inlineKeyboardMarkup = CatalogMenu.getStoresList(userBot.getId());
+                    title = Var.catalogGetMasterTitle + " " + storeDao.getStore(catalog.getShopId()).getTitle();
+                } else {
+                    inlineKeyboardMarkup = CatalogMenu.getCatalogMenu(par.getShopId(), par.getFatherId(), -1L, par.getTitle());
+                    title = Var.getStoresTitle + " " + storeDao.getStore(par.getShopId()).getTitle();
                 }
-                else {
-                    inlineKeyboardMarkup = CatalogMenu.getCatalogMenu(par.getShopId(),par.getFatherId(),-1L,par.getTitle());
-                    title = Var.getStoresTitle +" " +storeDao.getStore(par.getShopId()).getTitle();
-                }
-                editMessage(chatId,callbackId,"Каталог #"+catalog.getId() +" "+catalog.getTitle() + " удален!", msgId);
+                editMessage(chatId, callbackId, "Каталог #" + catalog.getId() + " " + catalog.getTitle() + " удален!", msgId);
                 Message message = sendMenu(
                         userBot.getTgId(),
                         title,
@@ -156,37 +176,14 @@ public class Button {
             case Var.productCreate -> {
                 //В данной ситуации objId это id магазина
                 //а objId2 catalog
-                Await await = new Await(userBot.getId(), Var.productCreate+objId+":"+objId2);
+                Await await = new Await(userBot.getId(), Var.productCreate + objId + ":" + objId2);
                 awaitDao.set(await);
-                editMessage(chatId,callbackId,"Введите название товара!",msgId);
-            }
-            //Отправка в гугл таблици
-            case "store:upload:" -> {
-                Upload upload = new Upload(this, Integer.parseInt(comandSeq[2]));
-                upload.execute();
-            }
-            //Получить из гугл таблиц
-            case "store:download:" -> {
-                Download download = new Download(this, Integer.parseInt(comandSeq[2]));
-                download.execute();
-                //Обновляем таблицу после изменений нужно для формирования очередности списков
-                Upload upload = new Upload(this, Integer.parseInt(comandSeq[2]));
-                upload.execute();
-            }
-            //Проверить на изменения
-            case "store:check:" -> {
-                Download download = new Download(this, Integer.parseInt(comandSeq[2]));
-                download.check();
-            }
-            case "store:permissions:" -> {
-                editMessage(chatId,callbackId,"Права на уппавление магизоном",msgId, CatalogMenu.getPermission(Long.valueOf(Integer.parseInt(comandSeq[2]))));
-
+                editMessage(chatId, callbackId, "Введите название товара!", msgId);
             }
         }
     }
 
-    private Message sendMessage(String mes)
-    {
+    private Message sendMessage(String mes) {
         SendMessage smd = SendMessage.builder().chatId(update.getMessage().getFrom().getId())
                 .text(mes).build();
         try {
@@ -197,7 +194,7 @@ public class Button {
     }
 
     private void editMessage(Long chatId, String queryId, String data, int msgId) {
-        logger.info("("+this.getClass().getSimpleName()+".java:"+new Throwable().getStackTrace()[0].getLineNumber()+")"+"<< editMessage " + data);
+        logger.info("(" + this.getClass().getSimpleName() + ".java:" + new Throwable().getStackTrace()[0].getLineNumber() + ")" + "<< editMessage " + data);
         EditMessageText newTxt = EditMessageText.builder()
                 .chatId(chatId.toString())
                 .messageId(msgId).text(data).build();
@@ -216,9 +213,10 @@ public class Button {
             d.printStackTrace();
         }
     }
+
     private void editMessage(Long chatId, String queryId, String title, int msgId, InlineKeyboardMarkup menu) {
         //--msgId;
-        logger.info("("+this.getClass().getSimpleName()+".java:"+new Throwable().getStackTrace()[0].getLineNumber()+")"+"<< editMessage 2");
+        logger.info("(" + this.getClass().getSimpleName() + ".java:" + new Throwable().getStackTrace()[0].getLineNumber() + ")" + "<< editMessage 2");
         EditMessageText newTxt = EditMessageText.builder()
                 .chatId(chatId.toString())
                 .messageId(msgId).text(title).build();
@@ -238,8 +236,9 @@ public class Button {
             d.printStackTrace();
         }
     }
+
     public Message sendMenu(Long who, String txt, InlineKeyboardMarkup kb) {
-        logger.info("("+this.getClass().getSimpleName()+".java:"+new Throwable().getStackTrace()[0].getLineNumber()+")"+"<< sendMenu txt");
+        logger.info("(" + this.getClass().getSimpleName() + ".java:" + new Throwable().getStackTrace()[0].getLineNumber() + ")" + "<< sendMenu txt");
         SendMessage sm = SendMessage.builder().chatId(who.toString())
                 .parseMode("HTML").text(txt)
                 .replyMarkup(kb).build();

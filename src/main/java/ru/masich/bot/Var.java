@@ -5,7 +5,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 
 public class Var {
-    public static final String createStore = "/create_store";
+    public static final String createStore = "store:create:";
     public static final String getMyStores = "/get_my_shops";
     public static final String startMenu = "/start_menu";
     public static final String getStartMenuTitle = "Главное меню";

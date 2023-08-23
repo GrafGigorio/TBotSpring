@@ -8,6 +8,6 @@ public interface StoreDao {
     List<Store> getAllStore();
     List<Store> getAllUserStores(Long userId);
     Store getStore(Long storeId);
-    Store saveOrUpdateStore(Store store);
-    Store deleteStore(Store store);
+    void saveOrUpdateStore(Store store);
+    void deleteStore(Store store);
 }

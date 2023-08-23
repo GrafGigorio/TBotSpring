@@ -1,37 +1,54 @@
 package ru.masich.bot.action.store;
 
+import com.google.api.client.auth.oauth2.Credential;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import ru.masich.Sheets.Auth;
 import ru.masich.Sheets.GoogleSheets;
+import ru.masich.StartBot;
 import ru.masich.bot.DAO.IMPL.CatalogDAOimpl;
 import ru.masich.bot.DAO.IMPL.ProductDAOimpl;
 import ru.masich.bot.DAO.interfaces.CatalogDAO;
 import ru.masich.bot.DAO.interfaces.ProductDAO;
-import ru.masich.bot.action.Button;
-import ru.masich.bot.entity.Catalog;
-import ru.masich.bot.entity.Product;
-import ru.masich.bot.entity.ProductCount;
-import ru.masich.bot.entity.ProductSize;
+import ru.masich.bot.entity.*;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.IdentityHashMap;
+import java.util.List;
+import java.util.Map;
 
 public class Download {
+    Logger logger = LoggerFactory.getLogger(Download.class);
     private static final CatalogDAO catalogDAO = new CatalogDAOimpl();
     private static final ProductDAO productDAO = new ProductDAOimpl();
-    private final Button butIn;
-    int shopid;
+    private StartBot startBot;
+    private Store store;
+    private String callbackID;
+    private Long tgUserId;
 
+    Credential credential = null;
 
-    public Download(Button button, int shopid)
+    public Download(Store store, StartBot startBot, String callbackID, Long tgUserId)
     {
-        this.butIn = button;
-        this.shopid= shopid;
+        this.startBot = startBot;
+        this.store= store;
+        this.callbackID = callbackID;
+        this.tgUserId = tgUserId;
+        try {
+            credential = Auth.getCredentialsServiceResources();
+        } catch (IOException | GeneralSecurityException e) {
+            throw new RuntimeException(e);
+        }
     }
     public void check()
     {
+        logger.info("(" + this.getClass().getSimpleName() + ".java:" + new Throwable().getStackTrace()[0].getLineNumber() +
+                ")" + "<< check" );
         catalogCheck("Категории!A3:F");
         productCheck("Товары!A3:F","Размер!A3:F","Количество!A3:F");
         sizeCheck("Размер!A3:F");
@@ -39,18 +56,38 @@ public class Download {
     }
 
     public void catalogCheck(String catTable) {
+        logger.info("(" + this.getClass().getSimpleName() + ".java:" + new Throwable().getStackTrace()[0].getLineNumber() +
+                ")" + "<< catalogCheck" );
         StringBuilder updates = new StringBuilder();
-
-        List<List<Object>> catalog;
+        List<List<Object>> catalog = new ArrayList<>();
 
         try {
-            catalog = GoogleSheets.get(catTable);//Категории!A3:F
+            catalog = GoogleSheets.get(credential, store.getTableID(), catTable);//Категории!A3:F
         } catch (GeneralSecurityException | IOException e) {
-            throw new RuntimeException(e);
+
+//            if(e.getMessage().contains("INVALID_ARGUMENT"))
+//            {
+//                List<List<Object>> listD = new ArrayList<>();
+//                listD.add(List.of( "Категории"));
+//                listD.add(List.of( "Уникальный номер категории",
+//                        "Уникальный номер родителя",
+//                        "Заголовок",
+//                        "Уникальный номер магазина",
+//                        "Уровень вложенности",
+//                        "Главное фото"));
+//                try {
+//                    GoogleSheets.addD2(store.getTableID(),listD,"Категории!A1:F2");
+//                } catch (GeneralSecurityException ex) {
+//                    throw new RuntimeException(ex);
+//                } catch (IOException ex) {
+//                    throw new RuntimeException(ex);
+//                }
+//            }
+//            throw new RuntimeException(e);
         }
 
         List<Catalog> ggTable = convertCatalog(catalog);
-        List<Catalog> db = catalogDAO.getCatalogAllStore((long) shopid);
+        List<Catalog> db = catalogDAO.getCatalogAllStore(store.getId());
 
         db.stream().filter(x -> {
             List<Catalog> dqe = ggTable.stream().filter(p ->
@@ -65,7 +102,7 @@ public class Download {
                 return true;
             }
         });
-
+        if(ggTable != null)
         for (Catalog cat : ggTable) {
             if (cat.getId() == null ) {
                 //Создаем новый каталог
@@ -90,21 +127,23 @@ public class Download {
         getStringBuilder(updates);
     }
     public void productCheck(String proTable,String sizeTable,String countTable) {
+        logger.info("(" + this.getClass().getSimpleName() + ".java:" + new Throwable().getStackTrace()[0].getLineNumber() +
+                ")" + "<< productCheck" );
         StringBuilder updates = new StringBuilder();
         List<List<Object>> products;
         List<List<Object>> size;
         List<List<Object>> count;
 
         try {
-            products = GoogleSheets.get(proTable);
-            size = GoogleSheets.get(sizeTable);
-            count = GoogleSheets.get(countTable);
+            products = GoogleSheets.get(credential, store.getTableID(), proTable);
+            size = GoogleSheets.get(credential, store.getTableID(), sizeTable);
+            count = GoogleSheets.get(credential, store.getTableID(), countTable);
         } catch (GeneralSecurityException | IOException e) {
             throw new RuntimeException(e);
         }
 
         List<Product> ggTable = convertProduct(products);
-        List<Product> db = productDAO.getStore((long) shopid);
+        List<Product> db = productDAO.getStore(store.getId());
 
         db.stream().filter(x -> {
             List<Product> dqe = ggTable.stream().filter(p ->
@@ -148,12 +187,14 @@ public class Download {
         getStringBuilder(updates);
     }
     public void sizeCheck(String sizeTable) {
+        logger.info("(" + this.getClass().getSimpleName() + ".java:" + new Throwable().getStackTrace()[0].getLineNumber() +
+                ")" + "<< sizeCheck" );
         StringBuilder updates = new StringBuilder();
         List<List<Object>> size;
 
         try {
             //Получаем размеры из таблици
-            size = GoogleSheets.get(sizeTable);
+            size = GoogleSheets.get(credential, store.getTableID(), sizeTable);
         } catch (GeneralSecurityException | IOException e) {
             throw new RuntimeException(e);
         }
@@ -198,12 +239,14 @@ public class Download {
         getStringBuilder(updates);
     }
     public void countCheck(String sizeTable) {
+        logger.info("(" + this.getClass().getSimpleName() + ".java:" + new Throwable().getStackTrace()[0].getLineNumber() +
+                ")" + "<< countCheck" );
         StringBuilder updates = new StringBuilder();
         List<List<Object>> countTable;
 
         try {
             //Получаем обьект количества из таблицы
-            countTable = GoogleSheets.get(sizeTable);
+            countTable = GoogleSheets.get(credential, store.getTableID(), sizeTable);
         } catch (GeneralSecurityException | IOException e) {
             throw new RuntimeException(e);
         }
@@ -247,13 +290,15 @@ public class Download {
         getStringBuilder(updates);
     }
     private void getStringBuilder(StringBuilder updates) {
+        logger.info("(" + this.getClass().getSimpleName() + ".java:" + new Throwable().getStackTrace()[0].getLineNumber() +
+                ")" + "<< getStringBuilder" );
         try {
-            butIn.startBot.execute(SendMessage.builder()
-                    .chatId(butIn.update.getCallbackQuery().getFrom().getId())
+            startBot.execute(SendMessage.builder()
+                    .chatId(tgUserId)
                     .text(updates.toString())
                     .build());
-            butIn.startBot.execute(AnswerCallbackQuery.builder()
-                    .callbackQueryId(butIn.update.getCallbackQuery().getId())
+            startBot.execute(AnswerCallbackQuery.builder()
+                    .callbackQueryId(callbackID)
                     //   .text(updates.toString())
                     .build());
         } catch (TelegramApiException e) {
@@ -261,7 +306,14 @@ public class Download {
         }
     }
     private List<Catalog> convertCatalog(List<List<Object>> cat) {
+        logger.info("(" + this.getClass().getSimpleName() + ".java:" + new Throwable().getStackTrace()[0].getLineNumber() +
+                ")" + "<< convertCatalog" );
         List<Catalog> cats = new ArrayList<>();
+        if(cat == null) {
+            logger.info("(" + this.getClass().getSimpleName() + ".java:" + new Throwable().getStackTrace()[0].getLineNumber() +
+                    ")" + "<< convertCatalog ТАблица пуста" );
+            return null;
+        }
         for (List<Object> catE : cat)
         {
             Catalog catalog = new Catalog();
@@ -282,6 +334,8 @@ public class Download {
         return cats;
     }
     private List<Product> convertProduct(List<List<Object>> products) {
+        logger.info("(" + this.getClass().getSimpleName() + ".java:" + new Throwable().getStackTrace()[0].getLineNumber() +
+                ")" + "<< convertProduct" );
         List<Product> prodOut = new ArrayList<>();
         for (List<Object> catE : products)
         {
@@ -313,6 +367,8 @@ public class Download {
         return prodOut;
     }
     private List<ProductSize> convertSize(List<List<Object>> size) {
+        logger.info("(" + this.getClass().getSimpleName() + ".java:" + new Throwable().getStackTrace()[0].getLineNumber() +
+                ")" + "<< convertSize" );
         List<ProductSize> sizeOut = new ArrayList<>();
         for (List<Object> sz : size)
         {
@@ -339,6 +395,8 @@ public class Download {
         return sizeOut;
     }
     private List<ProductCount> convertCount(List<List<Object>> size) {
+        logger.info("(" + this.getClass().getSimpleName() + ".java:" + new Throwable().getStackTrace()[0].getLineNumber() +
+                ")" + "<< convertCount" );
         List<ProductCount> countOut = new ArrayList<>();
         for (List<Object> sz : size)
         {
@@ -366,6 +424,8 @@ public class Download {
         return countOut;
     }
     private StringBuilder catalogExecute(List<Catalog> table, List<Catalog> db) {
+        logger.info("(" + this.getClass().getSimpleName() + ".java:" + new Throwable().getStackTrace()[0].getLineNumber() +
+                ")" + "<< catalogExecute" );
         StringBuilder update = new StringBuilder();
 
         db.stream().filter(x -> {
@@ -402,6 +462,8 @@ public class Download {
         return update;
     }
     private StringBuilder productExecute(List<Product> table, List<ProductSize> size, List<ProductCount> count, List<Product> db) {
+        logger.info("(" + this.getClass().getSimpleName() + ".java:" + new Throwable().getStackTrace()[0].getLineNumber() +
+                ")" + "<< productExecute" );
         StringBuilder update = new StringBuilder();
 
         db.stream().filter(x -> {
@@ -446,6 +508,8 @@ public class Download {
         return update;
     }
     public void execute(){
+        logger.info("(" + this.getClass().getSimpleName() + ".java:" + new Throwable().getStackTrace()[0].getLineNumber() +
+                ")" + "<< execute" );
         StringBuilder updates = new StringBuilder();
 
         List<List<Object>> catalog;
@@ -453,17 +517,17 @@ public class Download {
         List<List<Object>> size;
         List<List<Object>> count;
         try {
-            catalog = GoogleSheets.get("Категории!A3:F");
-            product = GoogleSheets.get("Товары!A3:F");
-            size = GoogleSheets.get("Размер!A3:F");
-            count = GoogleSheets.get("Количество!A3:F");
+            catalog = GoogleSheets.get(credential, store.getTableID(), "Категории!A3:F");
+            product = GoogleSheets.get(credential, store.getTableID(), "Товары!A3:F");
+            size = GoogleSheets.get(credential, store.getTableID(), "Размер!A3:F");
+            count = GoogleSheets.get(credential, store.getTableID(), "Количество!A3:F");
         } catch (GeneralSecurityException | IOException e) {
             throw new RuntimeException(e);
         }
 
         //Изменяем каталоги
-        updates.append(catalogExecute(convertCatalog(catalog), catalogDAO.getCatalogAllStore((long) shopid)));
-        updates.append(productExecute(convertProduct(product), convertSize(size), convertCount(count), productDAO.getStore((long) shopid)));
+        updates.append(catalogExecute(convertCatalog(catalog), catalogDAO.getCatalogAllStore(store.getId())));
+        updates.append(productExecute(convertProduct(product), convertSize(size), convertCount(count), productDAO.getStore(store.getId())));
 
         if(updates.length() < 5)
         {
