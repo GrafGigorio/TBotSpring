@@ -3,15 +3,17 @@ package ru.masich;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import ru.masich.bot.Proxy;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import ru.masich.bot.Proxy;
 
 import java.util.List;
 
 @Component
+@PropertySource({"classpath:./application.properties"})
 public class StartBot extends TelegramLongPollingBot {
 
     @Value("${bot.username}")

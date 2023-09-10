@@ -31,6 +31,17 @@ public class StoreDAOimpl implements StoreDao {
         } finally {
             session.close();
         }
+    }    @Override
+    public List<Store> getAllManagementStore() {
+        //Session session = sessionFactory.getCurrentSession();
+        logger.info("("+this.getClass().getSimpleName()+".java:"+new Throwable().getStackTrace()[0].getLineNumber()+")"+"<< getAllManagementStore");
+        try {
+            session = sessionFactory.openSession();
+            session.beginTransaction();
+            return session.createQuery("from Store where botShopToken is not null", Store.class).getResultList();
+        } finally {
+            session.close();
+        }
     }
 
     @Override

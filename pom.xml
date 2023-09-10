@@ -15,12 +15,16 @@
     <name>TBotSpring</name>
     <description>TBotSpring</description>
     <properties>
-        <java.version>18</java.version>
+        <java.version>17</java.version>
         <encoding.type>UTF-8</encoding.type>
         <start-class>ru.masich.TBotSpringApplication</start-class>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+        <filtering>true</filtering>
     </properties>
+
+
 
 
 

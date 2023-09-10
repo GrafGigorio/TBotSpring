@@ -17,10 +17,23 @@ public class Store {
     private String tableID;
     private String chartID;
     private String folderID;
+    private String botShopUserName;
+    private String botShopToken;
     @Convert(converter = HashMapConverter.class)
     private Map<String, Object> role;
 
-    public Store(Long userid, String title,String folderID, String tableID, String chartID, Map<String, Object> role) {
+    public Store(Long userid, String title, String tableID, String chartID, String folderID, String botShopUserName, String botShopToken, Map<String, Object> role) {
+        this.userid = userid;
+        this.title = title;
+        this.tableID = tableID;
+        this.chartID = chartID;
+        this.folderID = folderID;
+        this.botShopUserName = botShopUserName;
+        this.botShopToken = botShopToken;
+        this.role = role;
+    }
+
+    public Store(Long userid, String title, String folderID, String tableID, String chartID, Map<String, Object> role) {
         this.userid = userid;
         this.title = title;
         this.tableID = tableID;
@@ -103,16 +116,32 @@ public class Store {
         this.folderID = folderID;
     }
 
+    public String getBotShopUserName() {
+        return botShopUserName;
+    }
+
+    public void setBotShopUserName(String botShopUserName) {
+        this.botShopUserName = botShopUserName;
+    }
+
+    public String getBotShopToken() {
+        return botShopToken;
+    }
+
+    public void setBotShopToken(String botShopToken) {
+        this.botShopToken = botShopToken;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Store store = (Store) o;
-        return Objects.equals(id, store.id) && Objects.equals(userid, store.userid) && Objects.equals(title, store.title) && Objects.equals(tableID, store.tableID) && Objects.equals(chartID, store.chartID) && Objects.equals(folderID, store.folderID) && Objects.equals(role, store.role);
+        return Objects.equals(id, store.id) && Objects.equals(userid, store.userid) && Objects.equals(title, store.title) && Objects.equals(tableID, store.tableID) && Objects.equals(chartID, store.chartID) && Objects.equals(folderID, store.folderID) && Objects.equals(botShopUserName, store.botShopUserName) && Objects.equals(botShopToken, store.botShopToken) && Objects.equals(role, store.role);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, userid, title, tableID, chartID, folderID, role);
+        return Objects.hash(id, userid, title, tableID, chartID, folderID, botShopUserName, botShopToken, role);
     }
 }

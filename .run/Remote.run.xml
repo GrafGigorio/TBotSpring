@@ -1,10 +1,9 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="Remote" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
-    <option name="ACTIVE_PROFILES" />
     <option name="DEBUG_MODE" value="true" />
     <option name="INCLUDE_PROVIDED_SCOPE" value="false" />
     <module name="TBotSpring" />
-    <target name="graf@10.11.11.246:22" />
+    <target name="root@31.129.98.181:22" />
     <option name="SPRING_BOOT_MAIN_CLASS" value="ru.masich.TBotSpringApplication" />
     <method v="2">
       <option name="Make" enabled="true" />
